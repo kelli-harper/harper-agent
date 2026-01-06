@@ -1,14 +1,16 @@
-- Tool to create a harper app from the template
-- Search for a file by name
-- Search for file contents
-- Tool for interpreting code
-- Tool(s) for looking at the schemas for configs? Resources? Tables?
-- Tool for running Harper and observing the results
-- Tool for exercising the APIs
-- Tool for logging in to your Fabric account / cluster
-- Tool for deploying to Fabric
+- Display a spinning wheel while it thinks
+- Display when it executes a tool
+- Add more tools:
+  - Search for a file by name
+  - Search for file contents
+  - Tool for interpreting code
+  - Tool(s) for looking at the schemas for configs? Resources? Tables?
+  - Tool for running Harper and observing the results
+  - Tool for exercising the APIs
+  - Tool for logging in to your Fabric account / cluster
+  - Tool for deploying to Fabric
 - Reporting on total token usage
-- Start off with it asking some default question:
-  - If in an empty dir, "Want me to bootstrap a Harper app for you here?"
+- Start off with it asking:
+  - If in an empty dir, "What kind of Harper app can we create together?"
   - Check if we have an OpenAI key, and ask them to set one in .env if we don't.
-  - Otherwise, ask them what they want to do together.
+  - Otherwise, say the name of the harper app, and ask what they want to do together?
