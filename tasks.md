@@ -1,0 +1,18 @@
+- Works in the current directory
+- Designed for... global install? CLI for now. Link so I can hairper
+- Tool to create a harper app from the template
+- List files in a directory
+- Search for a file by name
+- Search for file contents
+- Tool to read file
+- Tool for interpreting code
+- Tool(s) for looking at the schemas for configs? Resources? Tables?
+- Tool for running Harper and observing the results
+- Tool for exercising the APIs
+- Tool for logging in to your Fabric account / cluster
+- Tool for deploying to Fabric
+- Reporting on total token usage
+- Start off with it asking some default question:
+  - If in an empty dir, "Want me to bootstrap a Harper app for you here?"
+  - Check if we have an OpenAI key, and ask them to set one in .env if we don't.
+  - Otherwise, ask them what they want to do together.
