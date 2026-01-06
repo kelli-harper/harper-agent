@@ -15,7 +15,9 @@ export async function askQuestion(query: string): Promise<string> {
 	});
 
 	try {
-		return await rl.question(query);
+		const response = await rl.question(query);
+		console.log('');
+		return response;
 	} finally {
 		rl.close();
 	}

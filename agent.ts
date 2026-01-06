@@ -1,10 +1,10 @@
-#!/usr/bin/env tsx
+#!/usr/bin/env /Users/dawson/.nvm/versions/node/v24.11.1/bin/node
 import 'dotenv/config';
 import {Agent, MemorySession, run} from '@openai/agents';
 import chalk from 'chalk';
 import {askQuestion} from './utils/askQuestion.ts';
-import {createApplyPatchTool} from "./tools/applyPatchTool.ts";
-import {harperResponse} from "./utils/harperResponse.ts";
+import {harperResponse} from './utils/harperResponse.ts';
+import {createTools} from './tools/factory.ts';
 
 async function main() {
     if (!process.env['OPENAI_API_KEY']) {
@@ -20,9 +20,7 @@ async function main() {
         name: 'Patch Assistant',
         model: 'gpt-5.2',
         instructions: `You can edit files inside ${workspaceRoot} using the apply_patch tool.`,
-        tools: [
-            createApplyPatchTool(workspaceRoot),
-        ],
+        tools: createTools(),
     });
 
     harperResponse('How can I assist you today?');

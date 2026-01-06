@@ -1,8 +1,6 @@
 - Tool to create a harper app from the template
-- List files in a directory
 - Search for a file by name
 - Search for file contents
-- Tool to read file
 - Tool for interpreting code
 - Tool(s) for looking at the schemas for configs? Resources? Tables?
 - Tool for running Harper and observing the results
