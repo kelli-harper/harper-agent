@@ -1,4 +1,3 @@
-- Display a spinning wheel while it thinks
 - Display when it executes a tool
 - Add more tools:
   - Search for a file by name
