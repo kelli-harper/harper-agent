@@ -1,5 +1,4 @@
 - Add more tools:
-  - Search for a file by name
   - Search for file contents
   - Tool for interpreting code
   - Tool(s) for looking at the schemas for configs? Resources? Tables?
