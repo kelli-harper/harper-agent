@@ -1,15 +1,17 @@
 import {createApplyPatchTool} from './applyPatchTool.ts';
-import {findTool} from './findTool.ts';
-import {readFileTool} from './readFileTool.ts';
-import {readDirTool} from './readDirTool.ts';
 import {createNewHarperApplicationTool} from './createNewHarperApplicationTool.ts';
+import {egrepTool} from './egrepTool.ts';
+import {findTool} from './findTool.ts';
+import {readDirTool} from './readDirTool.ts';
+import {readFileTool} from './readFileTool.ts';
 
 export function createTools() {
 	return [
 		createApplyPatchTool(),
-		findTool,
-		readFileTool,
-		readDirTool,
 		createNewHarperApplicationTool,
+		egrepTool,
+		findTool,
+		readDirTool,
+		readFileTool,
 	];
 }
