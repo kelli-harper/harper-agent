@@ -1,9 +1,18 @@
 - Add more tools:
   - Tool for running Harper and observing the results
-  - Tool for exercising the APIs (OpenAPI JSON?)
+    - Start
+    - Read recent logs
+    - Grab OpenAPI JSON?
+    - Setting the username and password we'll use?
+    - Logging in? With cookie...
+    - Hit API?
+    - Run operation?
+    - Stop
   - Tool for logging in to your Fabric account / cluster
   - Tool for deploying to Fabric
   - Tool(s) for looking at the schemas for configs? Resources? Tables?
+  - Arbitrary shell execution (with human-in-the-loop approval) with protections
+  - Ask if they want to automatically approve all code changes in the future.
 - Reporting on total token usage
 - Start off with it asking:
   - If in an empty dir, "What kind of Harper app can we create together?"
