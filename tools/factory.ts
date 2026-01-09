@@ -4,7 +4,8 @@ import {egrepTool} from './files/egrepTool.ts';
 import {findTool} from './files/findTool.ts';
 import {readDirTool} from './files/readDirTool.ts';
 import {readFileTool} from './files/readFileTool.ts';
-import {shellTool} from './files/shell.ts';
+import {shellTool} from './general/shell.ts';
+import {webTool} from './general/web.ts';
 import {createNewHarperApplicationTool} from './harper/createNewHarperApplicationTool.ts';
 import {openBrowserTool} from './harper/openBrowserTool.ts';
 import {readHarperLogsTool} from './harper/readHarperLogsTool.ts';
@@ -27,5 +28,6 @@ export function createTools() {
 		shellTool,
 		startHarperTool,
 		stopHarperTool,
+		webTool,
 	];
 }
