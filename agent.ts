@@ -2,9 +2,11 @@
 import 'dotenv/config';
 import {Agent, MemorySession, run} from '@openai/agents';
 import chalk from 'chalk';
+import {existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {createTools} from './tools/factory.ts';
 import {askQuestion} from './utils/askQuestion.ts';
 import {harperResponse} from './utils/harperResponse.ts';
-import {createTools} from './tools/factory.ts';
 import {spinner} from './utils/spinner.ts';
 
 async function main() {
@@ -15,16 +17,25 @@ async function main() {
     }
 
     const workspaceRoot = process.cwd();
+    const harperAppExists = existsSync(join(workspaceRoot, 'config.yaml'));
+
     console.log(chalk.dim(`Working directory: ${chalk.cyan(workspaceRoot)}`));
+    console.log(chalk.dim(`Harper app detected in it: ${chalk.cyan(harperAppExists ? 'Yes' : 'No')}`));
     console.log(chalk.dim(`Press Ctrl+C or hit enter twice to exit.\n`));
+
+    const vibing = harperAppExists ? 'updating' : 'creating';
     const agent = new Agent({
         name: 'Harper App Development Assistant',
         model: 'gpt-5.2',
-        instructions: `You are working on creating the harper app in ${workspaceRoot} with the user.`,
+        instructions: `You are working on ${vibing} the harper app in ${workspaceRoot} with the user.`,
         tools: createTools(),
     });
 
-    harperResponse('What kind of Harper app do you want to make together?');
+    harperResponse(
+      harperAppExists
+        ? 'What do you want to do together today?'
+        : 'What kind of Harper app do you want to make together?',
+    );
 
     const session = new MemorySession();
     let emptyLines = 0;

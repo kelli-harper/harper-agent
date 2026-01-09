@@ -13,7 +13,3 @@
   - Arbitrary shell execution (with human-in-the-loop approval) with protections
   - Ask if they want to automatically approve all code changes in the future.
 - Reporting on total token usage
-- Start off with it asking:
-  - If in an empty dir, "What kind of Harper app can we create together?"
-  - Check if we have an OpenAI key, and ask them to set one in .env if we don't.
-  - Otherwise, say the name of the harper app, and ask what they want to do together?
