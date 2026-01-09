@@ -8,7 +8,7 @@ export const stopHarperTool = tool({
 	name: 'stopHarperTool',
 	description: 'Stops all previously started Harper app background process.',
 	parameters: ToolParameters,
-	async execute({}: z.infer<typeof ToolParameters>) {
+	async execute() {
 		if (!harperProcess.running) {
 			return `Error: No Harper application is currently running.`;
 		}

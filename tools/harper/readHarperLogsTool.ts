@@ -8,7 +8,7 @@ export const readHarperLogsTool = tool({
 	name: 'readHarperLogsTool',
 	description: 'Reads the most recent console logs of a started Harper app.',
 	parameters: ToolParameters,
-	async execute({}: z.infer<typeof ToolParameters>) {
+	async execute() {
 		if (!harperProcess.running) {
 			return `Error: No Harper application is currently running.`;
 		}

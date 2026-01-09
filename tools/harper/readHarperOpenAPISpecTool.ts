@@ -9,7 +9,7 @@ export const readHarperOpenAPISpecTool = tool({
 	description:
 		'Reads the OpenAPI spec of a started Harper app.',
 	parameters: ToolParameters,
-	async execute({}: z.infer<typeof ToolParameters>) {
+	async execute() {
 		try {
 			if (!harperProcess.running) {
 				return `Error: No Harper application is currently running.`;
