@@ -1,15 +1,13 @@
 - Add more tools:
   - Tool for running Harper and observing the results
-    - Show in browser? Or give the AI a way to open a browser of it, with HITL permission.
-    - Start it off with the Vite plugin pre-installed?
-    - Grab OpenAPI JSON?
     - Setting the username and password we'll use?
     - Logging in? With cookie...
+    - Start it off with the Vite plugin pre-installed?
+    - Grab OpenAPI JSON?
     - Hit API?
     - Run operation?
   - Tool for logging in to your Fabric account / cluster
   - Tool for deploying to Fabric
   - Tool(s) for looking at the schemas for configs? Resources? Tables?
-  - Arbitrary shell execution (with human-in-the-loop approval) with protections
   - Ask if they want to automatically approve all code changes in the future.
 - Reporting on total token usage
