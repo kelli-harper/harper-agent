@@ -1,9 +1,9 @@
-import {tool} from '@openai/agents';
-import {execSync} from 'node:child_process';
-import {z} from 'zod';
+import { tool } from '@openai/agents';
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
-import {applyTemplateToDirectory} from '../../utils/applyTemplateToDirectory.ts';
-import {isIgnored} from '../../utils/aiignore.ts';
+import { z } from 'zod';
+import { isIgnored } from '../../utils/aiignore.ts';
+import { applyTemplateToDirectory } from '../../utils/applyTemplateToDirectory.ts';
 
 const ToolParameters = z.object({
 	directoryName: z
@@ -13,16 +13,15 @@ const ToolParameters = z.object({
 
 export const createNewHarperApplicationTool = tool({
 	name: 'createNewHarperApplicationTool',
-	description:
-		'Creates a new harper application by downloading the application template zip archive.',
+	description: 'Creates a new harper application by downloading the application template zip archive.',
 	parameters: ToolParameters,
-	async execute({directoryName}: z.infer<typeof ToolParameters>) {
+	async execute({ directoryName }: z.infer<typeof ToolParameters>) {
 		if (isIgnored(directoryName)) {
 			return `Error: Target directory ${directoryName} is restricted by .aiignore`;
 		}
 		try {
 			if (!fs.existsSync(directoryName)) {
-				fs.mkdirSync(directoryName, {recursive: true});
+				fs.mkdirSync(directoryName, { recursive: true });
 			}
 
 			const error = await applyTemplateToDirectory(directoryName);
@@ -31,7 +30,7 @@ export const createNewHarperApplicationTool = tool({
 			}
 
 			console.log(`Initializing new Git repository...`);
-			execSync('git init', {cwd: directoryName, stdio: 'ignore'});
+			execSync('git init', { cwd: directoryName, stdio: 'ignore' });
 
 			return `Successfully created new Harper application in '${directoryName}' and initialized Git repository.`;
 		} catch (error) {

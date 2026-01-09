@@ -1,4 +1,4 @@
-import {existsSync, readFileSync} from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 let ignorePatterns: string[] = [];
@@ -31,7 +31,7 @@ export function loadAiIgnore() {
  */
 export function isIgnored(filePath: string): boolean {
 	loadAiIgnore();
-	if (ignorePatterns.length === 0) return false;
+	if (ignorePatterns.length === 0) { return false; }
 
 	let relativePath = filePath;
 	if (path.isAbsolute(filePath)) {

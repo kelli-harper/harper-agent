@@ -1,7 +1,7 @@
-import {ChildProcess, spawn} from 'node:child_process';
+import { ChildProcess, spawn } from 'node:child_process';
 
 class HarperProcess {
-	private childProcess: ChildProcess|null = null;
+	private childProcess: ChildProcess | null = null;
 	private logs: string[] = [];
 
 	get running(): boolean {

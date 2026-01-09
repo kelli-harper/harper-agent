@@ -1,8 +1,8 @@
-import {tool} from '@openai/agents';
-import {readdir} from 'node:fs/promises';
-import {z} from 'zod';
+import { tool } from '@openai/agents';
+import { readdir } from 'node:fs/promises';
 import path from 'node:path';
-import {isIgnored} from '../../utils/aiignore.ts';
+import { z } from 'zod';
+import { isIgnored } from '../../utils/aiignore.ts';
 
 const ToolParameters = z.object({
 	directoryName: z
@@ -12,10 +12,9 @@ const ToolParameters = z.object({
 
 export const readDirTool = tool({
 	name: 'readDir',
-	description:
-		'Lists the files in a directory.',
+	description: 'Lists the files in a directory.',
 	parameters: ToolParameters,
-	async execute({directoryName}: z.infer<typeof ToolParameters>) {
+	async execute({ directoryName }: z.infer<typeof ToolParameters>) {
 		try {
 			const files = await readdir(directoryName, 'utf-8');
 			return files.filter(file => !isIgnored(path.join(directoryName, file)));

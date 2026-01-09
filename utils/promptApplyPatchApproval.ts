@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import {printDiff} from './printDiff.ts';
-import {askQuestion} from './askQuestion.ts';
-import {spinner} from './spinner.ts';
+import { askQuestion } from './askQuestion.ts';
+import { printDiff } from './printDiff.ts';
+import { spinner } from './spinner.ts';
 
 interface Operation {
 	type: string;

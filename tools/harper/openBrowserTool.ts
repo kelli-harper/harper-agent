@@ -1,7 +1,7 @@
-import {tool} from '@openai/agents';
-import {spawn} from 'node:child_process';
-import {platform} from 'node:os';
-import {z} from 'zod';
+import { tool } from '@openai/agents';
+import { spawn } from 'node:child_process';
+import { platform } from 'node:os';
+import { z } from 'zod';
 
 const alreadyOpened = new Set<string>();
 
@@ -13,7 +13,7 @@ const ToolParameters = z.object({
 
 export const openBrowserTool = tool({
 	name: 'openBrowserTool',
-	description: 'Opens the requested URL in the user\'s browser.',
+	description: "Opens the requested URL in the user's browser.",
 	parameters: ToolParameters,
 	async execute({ url }: z.infer<typeof ToolParameters>) {
 		try {

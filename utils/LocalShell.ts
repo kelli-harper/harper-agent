@@ -1,7 +1,7 @@
-import type {Shell, ShellAction, ShellOutputResult, ShellResult} from '@openai/agents';
-import {exec} from 'node:child_process';
+import type { Shell, ShellAction, ShellOutputResult, ShellResult } from '@openai/agents';
+import { exec } from 'node:child_process';
 import process from 'node:process';
-import {promisify} from 'node:util';
+import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 
@@ -14,7 +14,7 @@ export class LocalShell implements Shell {
 		for (const command of action.commands) {
 			let stdout = '';
 			let stderr = '';
-			let exitCode: number|null = 0;
+			let exitCode: number | null = 0;
 			let outcome: ShellOutputResult['outcome'] = {
 				type: 'exit',
 				exitCode: 0,
@@ -34,10 +34,9 @@ export class LocalShell implements Shell {
 				exitCode = typeof error?.code === 'number' ? error.code : null;
 				stdout = error?.stdout ?? '';
 				stderr = error?.stderr ?? '';
-				outcome =
-					error?.killed || error?.signal === 'SIGTERM'
-						? { type: 'timeout' }
-						: { type: 'exit', exitCode };
+				outcome = error?.killed || error?.signal === 'SIGTERM'
+					? { type: 'timeout' }
+					: { type: 'exit', exitCode };
 			}
 			output.push({
 				command,

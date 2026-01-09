@@ -1,7 +1,7 @@
-import {tool} from '@openai/agents';
-import {execSync} from 'node:child_process';
-import {z} from 'zod';
-import {isIgnored} from '../../utils/aiignore.ts';
+import { tool } from '@openai/agents';
+import { execSync } from 'node:child_process';
+import { z } from 'zod';
+import { isIgnored } from '../../utils/aiignore.ts';
 
 const ToolParameters = z.object({
 	path: z.string()
@@ -13,8 +13,7 @@ const ToolParameters = z.object({
 
 export const egrepTool = tool({
 	name: 'egrep',
-	description:
-		'File pattern searcher.',
+	description: 'File pattern searcher.',
 	parameters: ToolParameters,
 	async execute({ path, pattern }: z.infer<typeof ToolParameters>) {
 		try {
@@ -22,7 +21,7 @@ export const egrepTool = tool({
 			return output
 				.split('\n')
 				.filter(line => {
-					if (line.trim() === '') return false;
+					if (line.trim() === '') { return false; }
 					// egrep output format is typically path:line_content
 					const colonIndex = line.indexOf(':');
 					if (colonIndex !== -1) {

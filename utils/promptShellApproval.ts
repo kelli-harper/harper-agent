@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import process from 'node:process';
-import {askQuestion} from './askQuestion.ts';
-import {spinner} from './spinner.ts';
+import { askQuestion } from './askQuestion.ts';
+import { spinner } from './spinner.ts';
 
 export async function promptShellApproval(commands: string[]): Promise<boolean> {
 	if (process.env.SHELL_AUTO_APPROVE === '1') {

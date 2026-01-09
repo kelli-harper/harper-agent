@@ -11,7 +11,7 @@ class Spinner {
 	}
 
 	start() {
-		if (this.interval) return;
+		if (this.interval) { return; }
 		this.i = 0;
 		process.stdout.write(`${this.chars[this.i]} ${this.message}`);
 		this.interval = setInterval(() => {
@@ -21,7 +21,7 @@ class Spinner {
 	}
 
 	stop() {
-		if (!this.interval) return;
+		if (!this.interval) { return; }
 		clearInterval(this.interval);
 		this.interval = null;
 		process.stdout.write('\r\x1b[K');

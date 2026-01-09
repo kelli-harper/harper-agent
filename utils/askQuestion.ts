@@ -1,5 +1,5 @@
-import {createInterface} from 'node:readline/promises';
-import {cleanUpAndSayBye} from './cleanUpAndSayBye.ts';
+import { createInterface } from 'node:readline/promises';
+import { cleanUpAndSayBye } from './cleanUpAndSayBye.ts';
 
 export async function askQuestion(query: string): Promise<string> {
 	const rl = createInterface({

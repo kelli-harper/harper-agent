@@ -1,13 +1,12 @@
-import {tool} from '@openai/agents';
-import {z} from 'zod';
-import {harperProcess} from '../../utils/harperProcess.ts';
+import { tool } from '@openai/agents';
+import { z } from 'zod';
+import { harperProcess } from '../../utils/harperProcess.ts';
 
 const ToolParameters = z.object({});
 
 export const readHarperOpenAPISpecTool = tool({
 	name: 'readHarperOpenAPISpecTool',
-	description:
-		'Reads the OpenAPI spec of a started Harper app.',
+	description: 'Reads the OpenAPI spec of a started Harper app.',
 	parameters: ToolParameters,
 	async execute() {
 		try {

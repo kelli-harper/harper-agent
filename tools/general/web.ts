@@ -1,4 +1,4 @@
-import {webSearchTool} from '@openai/agents';
+import { webSearchTool } from '@openai/agents';
 
 export const webTool = webSearchTool({
 	filters: {
