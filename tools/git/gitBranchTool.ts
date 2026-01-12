@@ -14,6 +14,7 @@ export const gitBranchTool = tool({
 	name: 'gitBranchTool',
 	description: 'Create or switch to a git branch.',
 	parameters: GitBranchParameters,
+	needsApproval: true,
 	async execute({ branchName, create }: z.infer<typeof GitBranchParameters>) {
 		try {
 			const command = create ? `git checkout -b ${branchName}` : `git checkout ${branchName}`;

@@ -40,30 +40,33 @@ async function main() {
 
 	const session = new MemorySession();
 	let emptyLines = 0;
+	let approvalState: any | null = null;
 
 	while (true) {
-		const task = await askQuestion('> ');
-		if (!task) {
-			emptyLines += 1;
-			if (emptyLines >= 2) {
-				cleanUpAndSayBye();
-				process.exit(0);
-			}
-			continue;
-		}
-		emptyLines = 0;
+		let task: string = '';
 
-		process.stdout.write('\n');
+		if (!approvalState) {
+			task = await askQuestion('> ');
+			if (!task) {
+				emptyLines += 1;
+				if (emptyLines >= 2) {
+					cleanUpAndSayBye();
+					break;
+				}
+				continue;
+			}
+			emptyLines = 0;
+
+			process.stdout.write('\n');
+		}
+
 		spinner.start();
 
-		const stream = await run(
-			agent,
-			task,
-			{
-				session,
-				stream: true,
-			},
-		);
+		const stream = await run(agent, approvalState ?? task, {
+			session,
+			stream: true,
+		});
+		approvalState = null;
 
 		let hasStartedResponse = false;
 		let atStartOfLine = true;
@@ -117,6 +120,36 @@ async function main() {
 						spinner.start();
 					}
 					break;
+			}
+
+			if (stream.interruptions?.length) {
+				for (const interruption of stream.interruptions) {
+					if (interruption.rawItem.type !== 'function_call') {
+						throw new Error(
+							'Invalid interruption type: ' + interruption.rawItem.type,
+						);
+					}
+
+					spinner.stop();
+
+					console.log(
+						chalk.bold.bgYellow.black('\nTool approval required (see above):'),
+					);
+
+					const answer = await askQuestion(`\tProceed? [y/N] `);
+					const approved = answer.trim().toLowerCase();
+
+					spinner.start();
+
+					const ok = approved === 'y' || approved === 'yes' || approved === 'ok' || approved === 'k';
+					if (ok) {
+						stream.state.approve(interruption);
+					} else {
+						stream.state.reject(interruption);
+					}
+				}
+				approvalState = stream.state;
+				break;
 			}
 		}
 		spinner.stop();
