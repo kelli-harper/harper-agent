@@ -10,7 +10,8 @@
 		"lint:fix": "oxlint . --fix",
 		"format": "dprint check",
 		"format:fix": "dprint fmt",
-		"format:staged": "dprint check --staged"
+		"format:staged": "dprint check --staged",
+		"test": "vitest"
 	},
 	"bin": {
 		"hairper": "./agent.ts"
@@ -31,6 +32,7 @@
 		"dprint": "^0.51.1",
 		"oxlint": "^1.38.0",
 		"tsx": "^4.21.0",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.17"
 	}
 }
