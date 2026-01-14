@@ -161,7 +161,9 @@ async function main() {
 							: item.arguments
 							? JSON.stringify(item.arguments)
 							: '';
-						const displayedArgs = args ? `(${args.slice(0, argumentTruncationPoint)}${args.length > argumentTruncationPoint ? '...' : ''})` : '()';
+						const displayedArgs = args
+							? `(${args.slice(0, argumentTruncationPoint)}${args.length > argumentTruncationPoint ? '...' : ''})`
+							: '()';
 						console.log(`\n${chalk.yellow('🛠️')}  ${chalk.cyan(name)}${chalk.dim(displayedArgs)}`);
 						atStartOfLine = true;
 						spinner.start();
