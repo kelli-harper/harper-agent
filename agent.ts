@@ -7,18 +7,11 @@ import { join } from 'node:path';
 import { createTools } from './tools/factory.ts';
 import { askQuestion } from './utils/askQuestion.ts';
 import { cleanUpAndSayBye } from './utils/cleanUpAndSayBye.ts';
+import { CostTracker } from './utils/cost.ts';
 import { harperResponse } from './utils/harperResponse.ts';
 import { spinner } from './utils/spinner.ts';
 
 const argumentTruncationPoint = 100;
-const MODEL_PRICES: Record<string, { input: number; output: number }> = {
-	'gpt-5.2': { input: 1.75 / 1_000_000, output: 14.00 / 1_000_000 },
-};
-
-function calculateCost(model: string | undefined, inputTokens: number, outputTokens: number): number {
-	const prices = MODEL_PRICES[model || 'gpt-5.2'] || MODEL_PRICES['gpt-5.2']!;
-	return inputTokens * prices.input + outputTokens * prices.output;
-}
 
 async function main() {
 	if (!process.env['OPENAI_API_KEY']) {
@@ -30,9 +23,7 @@ async function main() {
 	const workspaceRoot = process.cwd();
 	const harperAppExists = existsSync(join(workspaceRoot, 'config.yaml'));
 
-	let totalInputTokens = 0;
-	let totalOutputTokens = 0;
-	let totalCost = 0;
+	const costTracker = new CostTracker();
 
 	console.log(chalk.dim(`Working directory: ${chalk.cyan(workspaceRoot)}`));
 	console.log(chalk.dim(`Harper app detected in it: ${chalk.cyan(harperAppExists ? 'Yes' : 'No')}`));
@@ -44,6 +35,11 @@ async function main() {
 		model: 'gpt-5.2',
 		instructions: `You are working on ${vibing} the harper app in ${workspaceRoot} with the user.`,
 		tools: createTools(),
+		modelSettings: {
+			providerData: {
+				service_tier: 'flex',
+			},
+		},
 	});
 
 	harperResponse(
@@ -77,16 +73,7 @@ async function main() {
 			if (!task) {
 				emptyLines += 1;
 				if (emptyLines >= 2) {
-					if (totalInputTokens > 0 || totalOutputTokens > 0) {
-						const fmt = (n: number) => new Intl.NumberFormat().format(n);
-						console.log(
-							chalk.dim(
-								`Final session usage: ${chalk.cyan(fmt(totalInputTokens))} input, ${
-									chalk.cyan(fmt(totalOutputTokens))
-								} output tokens. Total cost: ~${chalk.cyan('$' + totalCost.toFixed(4))}`,
-							),
-						);
-					}
+					costTracker.logFinalStats();
 					cleanUpAndSayBye();
 					break;
 				}
@@ -110,14 +97,7 @@ async function main() {
 			let atStartOfLine = true;
 
 			for await (const event of stream) {
-				const usage = stream.state.usage;
-				const turnCost = calculateCost(String(agent.model), usage.inputTokens, usage.outputTokens);
-				const fmt = (n: number) => new Intl.NumberFormat().format(n);
-				spinner.status = chalk.dim(
-					`[Tokens: ${chalk.cyan(fmt(usage.inputTokens))} in, ${chalk.cyan(fmt(usage.outputTokens))} out | Cost: ${
-						chalk.cyan('$' + turnCost.toFixed(4))
-					} (Total: ~${chalk.cyan('$' + (totalCost + turnCost).toFixed(4))})]`,
-				);
+				spinner.status = costTracker.getStatusString(stream.state.usage, String(agent.model));
 
 				switch (event.type) {
 					case 'raw_model_stream_event':
@@ -147,7 +127,9 @@ async function main() {
 						break;
 					case 'agent_updated_stream_event':
 						spinner.stop();
-						console.log(`\n${chalk.magenta('👤')} ${chalk.bold('Agent switched to:')} ${chalk.italic(event.agent.name)}`);
+						console.log(
+							`\n${chalk.magenta('👤')} ${chalk.bold('Agent switched to:')} ${chalk.italic(event.agent.name)}`,
+						);
 						atStartOfLine = true;
 						spinner.start();
 						break;
@@ -207,13 +189,7 @@ async function main() {
 			}
 
 			if (!approvalState) {
-				const usage = stream.state.usage;
-				const modelName = typeof agent.model === 'string' ? agent.model : 'gpt-4o';
-				const turnCost = calculateCost(modelName, usage.inputTokens, usage.outputTokens);
-
-				totalInputTokens += usage.inputTokens;
-				totalOutputTokens += usage.outputTokens;
-				totalCost += turnCost;
+				costTracker.recordTurn(String(agent.model), stream.state.usage);
 			}
 		} catch (error: any) {
 			spinner.stop();
