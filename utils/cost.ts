@@ -1,13 +1,17 @@
+import type { Usage } from '@openai/agents';
 import chalk from 'chalk';
 
 const MODEL_PRICES: Record<string, { input: number; cachedInput: number; output: number }> = {
 	'gpt-5.2': { input: 0.875 / 1_000_000, cachedInput: 0.0875 / 1_000_000, output: 7.00 / 1_000_000 }, // flex tier (slower and less expensive)
 };
 
-export function extractCachedTokens(inputTokenDetails?: Array<Record<string, number>>): number {
+export function extractCachedTokens(
+	inputTokenDetails?: Array<Record<string, number>> | Record<string, number>,
+): number {
 	let cachedInputTokens = 0;
 	if (inputTokenDetails) {
-		for (const inputTokenDetail of inputTokenDetails) {
+		const details = Array.isArray(inputTokenDetails) ? inputTokenDetails : [inputTokenDetails];
+		for (const inputTokenDetail of details) {
 			if (inputTokenDetail['cached_tokens']) {
 				cachedInputTokens += inputTokenDetail['cached_tokens'];
 			}
@@ -20,7 +24,7 @@ export function calculateCost(
 	model: string | undefined,
 	inputTokens: number,
 	outputTokens: number,
-	inputTokenDetails: Array<Record<string, number>> | undefined,
+	inputTokenDetails: Array<Record<string, number>> | Record<string, number> | undefined,
 ): number {
 	const prices = MODEL_PRICES[model || 'gpt-5.2'] || MODEL_PRICES['gpt-5.2']!;
 	const cachedInputTokens = extractCachedTokens(inputTokenDetails);
@@ -35,38 +39,66 @@ export class CostTracker {
 	private totalCachedInputTokens = 0;
 	private totalOutputTokens = 0;
 	private totalCost = 0;
+	private totalCompactionCost = 0;
 
 	public recordTurn(
 		model: string,
-		usage: { inputTokens: number; outputTokens: number; inputTokensDetails?: Array<Record<string, number>> },
+		usage: Usage,
 	) {
-		const turnCost = calculateCost(model, usage.inputTokens, usage.outputTokens, usage.inputTokensDetails);
+		const { turnCost, compactionCost } = this.calculateUsageCosts(model, usage);
 		this.totalInputTokens += usage.inputTokens;
 		this.totalCachedInputTokens += extractCachedTokens(usage.inputTokensDetails);
 		this.totalOutputTokens += usage.outputTokens;
 		this.totalCost += turnCost;
-		return turnCost;
+		this.totalCompactionCost += compactionCost;
+		return turnCost + compactionCost;
+	}
+
+	private calculateUsageCosts(model: string, usage: Usage | undefined): { turnCost: number; compactionCost: number } {
+		let turnCost = 0;
+		let compactionCost = 0;
+
+		if (usage?.requestUsageEntries && usage.requestUsageEntries.length > 0) {
+			for (const entry of usage.requestUsageEntries) {
+				const entryCost = calculateCost(
+					model,
+					entry.inputTokens,
+					entry.outputTokens,
+					entry.inputTokensDetails,
+				);
+				if (entry.endpoint === 'responses.compact') {
+					compactionCost += entryCost;
+				} else {
+					turnCost += entryCost;
+				}
+			}
+		} else if (usage) {
+			turnCost = calculateCost(model, usage.inputTokens, usage.outputTokens, usage.inputTokensDetails);
+		}
+
+		return { turnCost, compactionCost };
 	}
 
 	public getStatusString(
-		currentTurnUsage: { inputTokens: number; outputTokens: number; inputTokensDetails?: Array<Record<string, number>> },
+		currentTurnUsage: Usage | undefined,
 		model: string,
 	) {
-		const turnCost = calculateCost(
-			model,
-			currentTurnUsage.inputTokens,
-			currentTurnUsage.outputTokens,
-			currentTurnUsage.inputTokensDetails,
-		);
-		const cachedInputTokens = extractCachedTokens(currentTurnUsage.inputTokensDetails);
-		const fmt = (n: number) => new Intl.NumberFormat().format(n);
+		const { turnCost, compactionCost } = this.calculateUsageCosts(model, currentTurnUsage);
+		const totalTurnCost = turnCost + compactionCost;
+		const cachedInputTokens = extractCachedTokens(currentTurnUsage?.inputTokensDetails);
+		const fmt = (n: number | undefined) => n ? new Intl.NumberFormat().format(n) : 'n/a';
 		const cachedStr = cachedInputTokens > 0 ? ` (${chalk.cyan(fmt(cachedInputTokens))} cached)` : '';
 
+		let compactionStr = '';
+		if (compactionCost > 0) {
+			compactionStr = ` | Compaction: ${chalk.cyan('$' + compactionCost.toFixed(4))}`;
+		}
+
 		return chalk.dim(
-			`[Tokens: ${chalk.cyan(fmt(currentTurnUsage.inputTokens))} in${cachedStr}, ${
-				chalk.cyan(fmt(currentTurnUsage.outputTokens))
-			} out | Cost: ${chalk.cyan('$' + turnCost.toFixed(4))} (Total: ~${
-				chalk.cyan('$' + (this.totalCost + turnCost).toFixed(4))
+			`[Tokens: ${chalk.cyan(fmt(currentTurnUsage?.inputTokens))} in${cachedStr}, ${
+				chalk.cyan(fmt(currentTurnUsage?.outputTokens))
+			} out | Cost: ${chalk.cyan('$' + totalTurnCost.toFixed(4))}${compactionStr} (Total: ~${
+				chalk.cyan('$' + (this.totalCost + this.totalCompactionCost + totalTurnCost).toFixed(4))
 			})]`,
 		);
 	}
@@ -77,13 +109,20 @@ export class CostTracker {
 			const cachedStr = this.totalCachedInputTokens > 0
 				? ` (${chalk.cyan(fmt(this.totalCachedInputTokens))} cached)`
 				: '';
-			console.log(
-				chalk.dim(
-					`Final session usage: ${chalk.cyan(fmt(this.totalInputTokens))} input${cachedStr}, ${
-						chalk.cyan(fmt(this.totalOutputTokens))
-					} output tokens. Total cost: ~${chalk.cyan('$' + this.totalCost.toFixed(4))}`,
-				),
+			const totalCost = this.totalCost + this.totalCompactionCost;
+			let statsStr = chalk.dim(
+				`Final session usage: ${chalk.cyan(fmt(this.totalInputTokens))} input${cachedStr}, ${
+					chalk.cyan(fmt(this.totalOutputTokens))
+				} output tokens. Total cost: ~${chalk.cyan('$' + totalCost.toFixed(4))}`,
 			);
+
+			if (this.totalCompactionCost > 0) {
+				statsStr += chalk.dim(
+					` (Compaction: ${chalk.cyan('$' + this.totalCompactionCost.toFixed(4))})`,
+				);
+			}
+
+			console.log(statsStr);
 		}
 	}
 }

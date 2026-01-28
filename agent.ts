@@ -1,6 +1,6 @@
 #!/usr/bin/env /Users/dawson/.nvm/versions/node/v24.11.1/bin/node
 import 'dotenv/config';
-import { Agent, MemorySession, run } from '@openai/agents';
+import { Agent, MemorySession, OpenAIResponsesCompactionSession, run } from '@openai/agents';
 import chalk from 'chalk';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -48,7 +48,9 @@ async function main() {
 			: 'What kind of Harper app do you want to make together?',
 	);
 
-	const session = new MemorySession();
+	const session = new OpenAIResponsesCompactionSession({
+		underlyingSession: new MemorySession(),
+	});
 	let emptyLines = 0;
 	let approvalState: any | null = null;
 
