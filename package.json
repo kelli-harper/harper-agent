@@ -11,7 +11,8 @@
 		"format": "dprint check",
 		"format:fix": "dprint fmt",
 		"format:staged": "dprint check --staged",
-		"test": "vitest"
+		"test": "vitest --run",
+		"test:watch": "vitest"
 	},
 	"bin": {
 		"hairper": "./agent.ts"
