@@ -1,7 +1,7 @@
 {
 	"name": "hairper",
 	"description": "AI to help you with Harper app management",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"main": "index.js",
 	"scripts": {
 		"start": "tsx ./agent.ts",
