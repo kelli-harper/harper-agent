@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { createTools } from './tools/factory.ts';
 import { askQuestion } from './utils/askQuestion.ts';
 import { cleanUpAndSayBye } from './utils/cleanUpAndSayBye.ts';
-import { CostTracker } from './utils/cost.ts';
+import { costTracker } from './utils/cost.ts';
 import { harperResponse } from './utils/harperResponse.ts';
 import { spinner } from './utils/spinner.ts';
 
@@ -22,8 +22,6 @@ async function main() {
 
 	const workspaceRoot = process.cwd();
 	const harperAppExists = existsSync(join(workspaceRoot, 'config.yaml'));
-
-	const costTracker = new CostTracker();
 
 	console.log(chalk.dim(`Working directory: ${chalk.cyan(workspaceRoot)}`));
 	console.log(chalk.dim(`Harper app detected in it: ${chalk.cyan(harperAppExists ? 'Yes' : 'No')}`));
@@ -142,11 +140,20 @@ async function main() {
 							spinner.stop();
 							const item = event.item.rawItem ?? event.item;
 							const name = item.name || item.type || 'tool';
-							const args: string = typeof item.arguments === 'string'
+							let args: string = typeof item.arguments === 'string'
 								? item.arguments
 								: item.arguments
 								? JSON.stringify(item.arguments)
 								: '';
+
+							if (!args && item.type === 'shell_call' && item.action?.commands) {
+								args = JSON.stringify(item.action.commands);
+							}
+
+							if (!args && item.type === 'apply_patch_call' && item.operation) {
+								args = JSON.stringify(item.operation);
+							}
+
 							const displayedArgs = args
 								? `(${args.slice(0, argumentTruncationPoint)}${args.length > argumentTruncationPoint ? '...' : ''})`
 								: '()';

@@ -34,7 +34,7 @@ export function calculateCost(
 		+ outputTokens * prices.output;
 }
 
-export class CostTracker {
+class CostTracker {
 	private totalInputTokens = 0;
 	private totalCachedInputTokens = 0;
 	private totalOutputTokens = 0;
@@ -85,21 +85,8 @@ export class CostTracker {
 	) {
 		const { turnCost, compactionCost } = this.calculateUsageCosts(model, currentTurnUsage);
 		const totalTurnCost = turnCost + compactionCost;
-		const cachedInputTokens = extractCachedTokens(currentTurnUsage?.inputTokensDetails);
-		const fmt = (n: number | undefined) => n ? new Intl.NumberFormat().format(n) : 'n/a';
-		const cachedStr = cachedInputTokens > 0 ? ` (${chalk.cyan(fmt(cachedInputTokens))} cached)` : '';
-
-		let compactionStr = '';
-		if (compactionCost > 0) {
-			compactionStr = ` | Compaction: ${chalk.cyan('$' + compactionCost.toFixed(4))}`;
-		}
-
 		return chalk.dim(
-			`[Tokens: ${chalk.cyan(fmt(currentTurnUsage?.inputTokens))} in${cachedStr}, ${
-				chalk.cyan(fmt(currentTurnUsage?.outputTokens))
-			} out | Cost: ${chalk.cyan('$' + totalTurnCost.toFixed(4))}${compactionStr} (Total: ~${
-				chalk.cyan('$' + (this.totalCost + this.totalCompactionCost + totalTurnCost).toFixed(4))
-			})]`,
+			`[~${chalk.cyan('$' + (this.totalCost + this.totalCompactionCost + totalTurnCost).toFixed(4))}]`,
 		);
 	}
 
@@ -126,3 +113,5 @@ export class CostTracker {
 		}
 	}
 }
+
+export const costTracker = new CostTracker();

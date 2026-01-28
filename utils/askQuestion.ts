@@ -1,5 +1,6 @@
 import { createInterface } from 'node:readline/promises';
 import { cleanUpAndSayBye } from './cleanUpAndSayBye.ts';
+import { costTracker } from './cost.ts';
 
 export async function askQuestion(query: string): Promise<string> {
 	const rl = createInterface({
@@ -8,6 +9,7 @@ export async function askQuestion(query: string): Promise<string> {
 	});
 
 	rl.on('SIGINT', () => {
+		costTracker.logFinalStats();
 		cleanUpAndSayBye();
 		rl.close();
 		process.exit(0);
