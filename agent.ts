@@ -50,6 +50,7 @@ async function main() {
 
 	const session = new OpenAIResponsesCompactionSession({
 		underlyingSession: new MemorySession(),
+		model: 'gpt-4o-mini',
 	});
 	let emptyLines = 0;
 	let approvalState: any | null = null;
