@@ -72,6 +72,7 @@ If you want to help us advance the source code that powers Hairper, take a look 
    ```env
    OPENAI_API_KEY=your_api_key_here
    OPENAI_AGENTS_DISABLE_TRACING=1
+   HAIRPER_SKIP_UPDATE=true
    ```
 
 ### Running the Agent

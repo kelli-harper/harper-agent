@@ -6,6 +6,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createTools } from './tools/factory.ts';
 import { askQuestion } from './utils/askQuestion.ts';
+import { checkForUpdate } from './utils/checkForUpdate.ts';
 import { cleanUpAndSayBye } from './utils/cleanUpAndSayBye.ts';
 import { costTracker } from './utils/cost.ts';
 import { harperResponse } from './utils/harperResponse.ts';
@@ -14,6 +15,8 @@ import { spinner } from './utils/spinner.ts';
 const argumentTruncationPoint = 100;
 
 async function main() {
+	await checkForUpdate();
+
 	if (!process.env['OPENAI_API_KEY']) {
 		harperResponse(chalk.red('Error: OPENAI_API_KEY is not set.'));
 		console.log(`Please set it in your environment or in a ${chalk.cyan('.env')} file.`);
