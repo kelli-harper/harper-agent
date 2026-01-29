@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Check lint
-        run: npm run link
+        run: npm run lint
       - name: Check format
         run: npm run format
       - name: Run unit tests
