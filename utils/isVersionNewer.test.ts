@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isVersionNewer } from './isVersionNewer.ts';
+import { isVersionNewer } from './isVersionNewer';
 
 describe('isVersionNewer', () => {
 	it('should return true if latest version is newer (major)', () => {

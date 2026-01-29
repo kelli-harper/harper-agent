@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { isIgnored } from './aiignore.ts';
+import { isIgnored } from './aiignore';
 
 vi.mock('node:fs');
 

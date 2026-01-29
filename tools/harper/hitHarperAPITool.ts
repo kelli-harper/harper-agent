@@ -1,6 +1,6 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
-import { harperProcess } from '../../utils/harperProcess.ts';
+import { harperProcess } from '../../utils/harperProcess';
 
 const ToolParameters = z.object({
 	method: z.enum(['POST', 'GET', 'PUT', 'DELETE']).optional().default('GET').describe(

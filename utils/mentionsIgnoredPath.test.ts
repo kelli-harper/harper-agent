@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isIgnored } from './aiignore.ts';
-import { mentionsIgnoredPath } from './mentionsIgnoredPath.ts';
+import { isIgnored } from './aiignore';
+import { mentionsIgnoredPath } from './mentionsIgnoredPath';
 
-vi.mock('./aiignore.ts', () => ({
+vi.mock('./aiignore.js', () => ({
 	isIgnored: vi.fn(),
 }));
 

@@ -1,21 +1,30 @@
-#!/usr/bin/env /Users/dawson/.nvm/versions/node/v24.11.1/bin/node
+#!/usr/bin/env node
 import 'dotenv/config';
 import { Agent, MemorySession, OpenAIResponsesCompactionSession, run } from '@openai/agents';
 import chalk from 'chalk';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { createTools } from './tools/factory.ts';
-import { askQuestion } from './utils/askQuestion.ts';
-import { checkForUpdate } from './utils/checkForUpdate.ts';
-import { cleanUpAndSayBye } from './utils/cleanUpAndSayBye.ts';
-import { costTracker } from './utils/cost.ts';
-import { ensureApiKey } from './utils/ensureApiKey.ts';
-import { harperResponse } from './utils/harperResponse.ts';
-import { spinner } from './utils/spinner.ts';
+import { createTools } from './tools/factory';
+import { askQuestion } from './utils/askQuestion';
+import { checkForUpdate } from './utils/checkForUpdate';
+import { cleanUpAndSayBye } from './utils/cleanUpAndSayBye';
+import { handleHelp, handleVersion, isHelpRequest, isVersionRequest } from './utils/cli';
+import { costTracker } from './utils/cost';
+import { ensureApiKey } from './utils/ensureApiKey';
+import { harperResponse } from './utils/harperResponse';
+import { spinner } from './utils/spinner';
 
 const argumentTruncationPoint = 100;
 
 async function main() {
+	const args = process.argv.slice(2);
+	if (isHelpRequest(args)) {
+		return handleHelp();
+	}
+	if (isVersionRequest(args)) {
+		return handleVersion();
+	}
+
 	await checkForUpdate();
 	await ensureApiKey();
 
@@ -108,6 +117,13 @@ async function main() {
 			}
 			emptyLines = 0;
 
+			if (isHelpRequest([task])) {
+				handleHelp();
+			}
+			if (isVersionRequest([task])) {
+				handleVersion();
+			}
+
 			process.stdout.write('\n');
 		}
 
@@ -164,7 +180,7 @@ async function main() {
 					case 'run_item_stream_event':
 						if (event.name === 'tool_called') {
 							spinner.stop();
-							const item = event.item.rawItem ?? event.item;
+							const item: any = event.item.rawItem ?? event.item;
 							const name = item.name || item.type || 'tool';
 							let args: string = typeof item.arguments === 'string'
 								? item.arguments

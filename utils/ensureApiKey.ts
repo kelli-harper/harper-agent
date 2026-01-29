@@ -1,7 +1,7 @@
 import chalk from 'chalk';
-import { askSecureQuestion } from './askSecureQuestion.ts';
-import { harperResponse } from './harperResponse.ts';
-import { updateEnv } from './updateEnv.ts';
+import { askSecureQuestion } from './askSecureQuestion';
+import { harperResponse } from './harperResponse';
+import { updateEnv } from './updateEnv';
 
 export async function ensureApiKey(): Promise<void> {
 	if (!process.env['OPENAI_API_KEY']) {

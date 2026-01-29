@@ -1,6 +1,6 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
-import { updateEnv } from '../../utils/updateEnv.ts';
+import { updateEnv } from '../../utils/updateEnv';
 
 const SetShellAutoApproveParameters = z.object({
 	autoApprove: z.boolean(),

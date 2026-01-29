@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isRiskyCommand } from './isRiskyCommand.ts';
+import { isRiskyCommand } from './isRiskyCommand';
 
 describe('isRiskyCommand', () => {
 	const testCases = [

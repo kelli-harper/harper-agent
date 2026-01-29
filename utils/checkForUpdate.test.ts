@@ -1,13 +1,13 @@
 import spawn from 'cross-spawn';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { checkForUpdate } from './checkForUpdate.ts';
-import { getLatestVersion } from './getLatestVersion.ts';
-import { getOwnPackageJson } from './getOwnPackageJson.ts';
-import { isVersionNewer } from './isVersionNewer.ts';
+import { checkForUpdate } from './checkForUpdate';
+import { getLatestVersion } from './getLatestVersion';
+import { getOwnPackageJson } from './getOwnPackageJson';
+import { isVersionNewer } from './isVersionNewer';
 
-vi.mock('./getLatestVersion.ts');
-vi.mock('./getOwnPackageJson.ts');
-vi.mock('./isVersionNewer.ts');
+vi.mock('./getLatestVersion.js');
+vi.mock('./getOwnPackageJson.js');
+vi.mock('./isVersionNewer.js');
 vi.mock('cross-spawn');
 
 describe('checkForUpdate', () => {

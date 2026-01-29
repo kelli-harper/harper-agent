@@ -2,7 +2,7 @@ import { tool } from '@openai/agents';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { z } from 'zod';
-import { isIgnored } from '../../utils/aiignore.ts';
+import { isIgnored } from '../../utils/aiignore';
 
 const execFileAsync = promisify(execFile);
 

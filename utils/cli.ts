@@ -1,0 +1,54 @@
+import chalk from 'chalk';
+import { getOwnPackageJson } from './getOwnPackageJson';
+
+/**
+ * Checks if the provided arguments contain a help request.
+ */
+export function isHelpRequest(args: string[]): boolean {
+	const helpVariants = ['--help', '-h', 'help'];
+	return args.some((arg) => helpVariants.includes(arg.toLowerCase()));
+}
+
+/**
+ * Checks if the provided arguments contain a version request.
+ */
+export function isVersionRequest(args: string[]): boolean {
+	const versionVariants = ['--version', '-v', 'version'];
+	return args.some((arg) => versionVariants.includes(arg.toLowerCase()));
+}
+
+/**
+ * Prints the help information and exits.
+ */
+export function handleHelp(): void {
+	console.log(`
+${chalk.bold('hairper')} - AI to help you with Harper app management
+
+${chalk.bold('USAGE')}
+  $ hairper [options]
+  $ hairper [command]
+
+${chalk.bold('OPTIONS')}
+  -h, --help     Show help information
+  -v, --version  Show version information
+
+${chalk.bold('COMMANDS')}
+  help           Show help information
+  version        Show version information
+
+${chalk.bold('EXAMPLES')}
+  $ hairper --help
+  $ hairper version
+  $ hairper "create a new harper app"
+`);
+	process.exit(0);
+}
+
+/**
+ * Prints the version and exits.
+ */
+export function handleVersion(): void {
+	const pkg = getOwnPackageJson();
+	console.log(pkg.version);
+	process.exit(0);
+}

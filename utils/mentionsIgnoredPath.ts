@@ -1,4 +1,4 @@
-import { isIgnored } from './aiignore.ts';
+import { isIgnored } from './aiignore';
 
 /**
  * Heuristically extracts potential paths from a shell command and checks if any are ignored by .aiignore.

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getLatestVersion } from './getLatestVersion.ts';
+import { getLatestVersion } from './getLatestVersion';
 
 describe('getLatestVersion', () => {
 	afterEach(() => {

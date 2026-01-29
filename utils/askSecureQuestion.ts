@@ -1,7 +1,7 @@
 import { createInterface } from 'node:readline/promises';
 import { Writable } from 'node:stream';
-import { cleanUpAndSayBye } from './cleanUpAndSayBye.ts';
-import { costTracker } from './cost.ts';
+import { cleanUpAndSayBye } from './cleanUpAndSayBye';
+import { costTracker } from './cost';
 
 export async function askSecureQuestion(query: string): Promise<string> {
 	let muted = false;

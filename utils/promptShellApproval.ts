@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import process from 'node:process';
-import { askQuestion } from './askQuestion.ts';
-import { isRiskyCommand } from './isRiskyCommand.ts';
-import { mentionsIgnoredPath } from './mentionsIgnoredPath.ts';
-import { spinner } from './spinner.ts';
+import { askQuestion } from './askQuestion';
+import { isRiskyCommand } from './isRiskyCommand';
+import { mentionsIgnoredPath } from './mentionsIgnoredPath';
+import { spinner } from './spinner';
 
 export async function promptShellApproval(commands: string[]): Promise<boolean> {
 	spinner.stop();

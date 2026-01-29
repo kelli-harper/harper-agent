@@ -1,6 +1,6 @@
 import { shellTool } from '@openai/agents';
-import { LocalShell } from '../../utils/LocalShell.ts';
-import { promptShellApproval } from '../../utils/promptShellApproval.ts';
+import { LocalShell } from '../../utils/LocalShell';
+import { promptShellApproval } from '../../utils/promptShellApproval';
 
 const tool = shellTool({
 	shell: new LocalShell(),

@@ -2,15 +2,16 @@
 	"name": "hairper",
 	"description": "AI to help you with Harper app management",
 	"version": "0.1.0",
-	"main": "index.js",
+	"main": "dist/agent.js",
 	"repository": "github:HarperFast/hairper",
 	"bugs": {
 		"url": "https://github.com/harperfast/hairper/issues"
 	},
 	"homepage": "https://github.com/harperfast",
 	"scripts": {
+		"build": "tsup agent.ts --format esm --clean --dts",
 		"commitlint": "commitlint --edit",
-		"start": "tsx ./agent.ts",
+		"start": "node ./dist/agent.js",
 		"dev": "tsx watch ./agent.ts",
 		"lint": "oxlint .",
 		"lint:fix": "oxlint . --fix",
@@ -20,10 +21,11 @@
 		"format:staged": "dprint check --staged --allow-no-files",
 		"test": "vitest --run",
 		"test:coverage": "vitest run --coverage",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"prepublishOnly": "npm run build"
 	},
 	"bin": {
-		"hairper": "./agent.ts"
+		"hairper": "./dist/agent.js"
 	},
 	"keywords": [],
 	"author": {
@@ -31,10 +33,9 @@
 		"email": "support@harperdb.io"
 	},
 	"files": [
-		"agent.ts",
-		"tools/",
-		"utils/",
-		"!**/*.test.ts"
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.map"
 	],
 	"license": "None",
 	"type": "module",
@@ -61,6 +62,7 @@
 		"husky": "^9.1.7",
 		"oxlint": "^1.38.0",
 		"semantic-release": "^25.0.2",
+		"tsup": "^8.5.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.17"

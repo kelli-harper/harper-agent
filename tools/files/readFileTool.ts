@@ -1,7 +1,7 @@
 import { tool } from '@openai/agents';
 import { readFile } from 'node:fs/promises';
 import { z } from 'zod';
-import { isIgnored } from '../../utils/aiignore.ts';
+import { isIgnored } from '../../utils/aiignore';
 
 const ToolParameters = z.object({
 	fileName: z

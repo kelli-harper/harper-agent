@@ -1,8 +1,8 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
-import { isIgnored } from '../../utils/aiignore.ts';
-import { harperProcess } from '../../utils/harperProcess.ts';
-import { sleep } from '../../utils/sleep.ts';
+import { isIgnored } from '../../utils/aiignore';
+import { harperProcess } from '../../utils/harperProcess';
+import { sleep } from '../../utils/sleep';
 
 const ToolParameters = z.object({
 	directoryName: z

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateCost, extractCachedTokens } from './cost.ts';
+import { calculateCost, extractCachedTokens } from './cost';
 
 describe('cost utilities', () => {
 	describe('extractCachedTokens', () => {

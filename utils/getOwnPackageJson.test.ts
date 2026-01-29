@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getOwnPackageJson } from './getOwnPackageJson.ts';
+import { getOwnPackageJson } from './getOwnPackageJson';
 
 vi.mock('node:fs', () => ({
 	readFileSync: vi.fn(),

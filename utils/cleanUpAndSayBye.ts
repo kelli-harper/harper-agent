@@ -1,5 +1,5 @@
-import { harperProcess } from './harperProcess.ts';
-import { harperResponse } from './harperResponse.ts';
+import { harperProcess } from './harperProcess';
+import { harperResponse } from './harperResponse';
 
 export function cleanUpAndSayBye() {
 	if (harperProcess.startedByHairper) {

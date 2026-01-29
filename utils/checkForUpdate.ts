@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import spawn from 'cross-spawn';
-import { getLatestVersion } from './getLatestVersion.ts';
-import { getOwnPackageJson } from './getOwnPackageJson.ts';
-import { isVersionNewer } from './isVersionNewer.ts';
+import { getLatestVersion } from './getLatestVersion';
+import { getOwnPackageJson } from './getOwnPackageJson';
+import { isVersionNewer } from './isVersionNewer';
 
 /**
  * Checks if a newer version of hairper is available on npm.

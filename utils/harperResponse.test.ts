@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { harperResponse } from './harperResponse.ts';
+import { harperResponse } from './harperResponse';
 
 describe('harperResponse', () => {
 	it('should log formatted text to console when provided', () => {
