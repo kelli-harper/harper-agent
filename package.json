@@ -17,7 +17,7 @@
 		"prepare": "husky",
 		"format": "dprint check",
 		"format:fix": "dprint fmt",
-		"format:staged": "dprint check --staged",
+		"format:staged": "dprint check --staged --allow-no-files",
 		"test": "vitest --run",
 		"test:coverage": "vitest run --coverage",
 		"test:watch": "vitest"
