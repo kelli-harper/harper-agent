@@ -83,6 +83,9 @@ By default, `hairper` uses `gpt-4o-mini` for session memory compaction. You can 
 hairper --compaction-model claude-3-haiku-20240307
 ```
 
+> [!NOTE]
+> Conversation compaction is currently only enabled when using an OpenAI model as the primary model. For non-OpenAI models (Anthropic, Google, Ollama), compaction is disabled to ensure compatibility with their respective SDKs.
+
 You can also set the default compaction model via the `HAIRPER_COMPACTION_MODEL` environment variable.
 
 ### Ollama Support (Local Models)

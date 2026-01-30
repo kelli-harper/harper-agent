@@ -1,9 +1,55 @@
 import type { Usage } from '@openai/agents';
 import chalk from 'chalk';
 
-const MODEL_PRICES: Record<string, { input: number; cachedInput: number; output: number }> = {
-	'gpt-5.2': { input: 0.875 / 1_000_000, cachedInput: 0.0875 / 1_000_000, output: 7.00 / 1_000_000 }, // flex tier (slower and less expensive)
+export type ServiceTier = 'flex' | 'standard';
+
+const FLEX_PRICES: Record<string, { input: number; cachedInput: number; output: number }> = {
+	'gpt-5.2': { input: 0.875 / 1_000_000, cachedInput: 0.0875 / 1_000_000, output: 7.00 / 1_000_000 },
+	'gpt-5.1': { input: 0.625 / 1_000_000, cachedInput: 0.0625 / 1_000_000, output: 5.00 / 1_000_000 },
+	'gpt-5': { input: 0.625 / 1_000_000, cachedInput: 0.0625 / 1_000_000, output: 5.00 / 1_000_000 },
+	'gpt-5-mini': { input: 0.125 / 1_000_000, cachedInput: 0.0125 / 1_000_000, output: 1.00 / 1_000_000 },
+	'gpt-5-nano': { input: 0.025 / 1_000_000, cachedInput: 0.0025 / 1_000_000, output: 0.20 / 1_000_000 },
+	'o3': { input: 1.00 / 1_000_000, cachedInput: 0.25 / 1_000_000, output: 4.00 / 1_000_000 },
+	'o4-mini': { input: 0.55 / 1_000_000, cachedInput: 0.138 / 1_000_000, output: 2.20 / 1_000_000 },
 };
+
+const STANDARD_PRICES: Record<string, { input: number; cachedInput: number; output: number }> = {
+	'gpt-5.2': { input: 1.75 / 1_000_000, cachedInput: 0.175 / 1_000_000, output: 14.00 / 1_000_000 },
+	'gpt-5.1': { input: 1.25 / 1_000_000, cachedInput: 0.125 / 1_000_000, output: 10.00 / 1_000_000 },
+	'gpt-5': { input: 1.25 / 1_000_000, cachedInput: 0.125 / 1_000_000, output: 10.00 / 1_000_000 },
+	'gpt-5-mini': { input: 0.25 / 1_000_000, cachedInput: 0.025 / 1_000_000, output: 2.00 / 1_000_000 },
+	'gpt-5-nano': { input: 0.05 / 1_000_000, cachedInput: 0.005 / 1_000_000, output: 0.40 / 1_000_000 },
+	'gpt-5.2-chat-latest': { input: 1.75 / 1_000_000, cachedInput: 0.175 / 1_000_000, output: 14.00 / 1_000_000 },
+	'gpt-5.1-chat-latest': { input: 1.25 / 1_000_000, cachedInput: 0.125 / 1_000_000, output: 10.00 / 1_000_000 },
+	'gpt-5-chat-latest': { input: 1.25 / 1_000_000, cachedInput: 0.125 / 1_000_000, output: 10.00 / 1_000_000 },
+	'gpt-5.2-pro': { input: 21.00 / 1_000_000, cachedInput: 21.00 / 1_000_000, output: 168.00 / 1_000_000 },
+	'gpt-5-pro': { input: 15.00 / 1_000_000, cachedInput: 15.00 / 1_000_000, output: 120.00 / 1_000_000 },
+	'gpt-4.1': { input: 2.00 / 1_000_000, cachedInput: 0.50 / 1_000_000, output: 8.00 / 1_000_000 },
+	'gpt-4.1-mini': { input: 0.40 / 1_000_000, cachedInput: 0.10 / 1_000_000, output: 1.60 / 1_000_000 },
+	'gpt-4.1-nano': { input: 0.10 / 1_000_000, cachedInput: 0.025 / 1_000_000, output: 0.40 / 1_000_000 },
+	'gpt-4o': { input: 2.50 / 1_000_000, cachedInput: 1.25 / 1_000_000, output: 10.00 / 1_000_000 },
+	'gpt-4o-2024-05-13': { input: 5.00 / 1_000_000, cachedInput: 5.00 / 1_000_000, output: 15.00 / 1_000_000 },
+	'gpt-4o-mini': { input: 0.15 / 1_000_000, cachedInput: 0.075 / 1_000_000, output: 0.60 / 1_000_000 },
+	'o1': { input: 15.00 / 1_000_000, cachedInput: 7.50 / 1_000_000, output: 60.00 / 1_000_000 },
+	'o1-pro': { input: 150.00 / 1_000_000, cachedInput: 150.00 / 1_000_000, output: 600.00 / 1_000_000 },
+	'o3-pro': { input: 20.00 / 1_000_000, cachedInput: 20.00 / 1_000_000, output: 80.00 / 1_000_000 },
+	'o3': { input: 2.00 / 1_000_000, cachedInput: 0.50 / 1_000_000, output: 8.00 / 1_000_000 },
+	'o3-deep-research': { input: 10.00 / 1_000_000, cachedInput: 2.50 / 1_000_000, output: 40.00 / 1_000_000 },
+	'o4-mini': { input: 1.10 / 1_000_000, cachedInput: 0.275 / 1_000_000, output: 4.40 / 1_000_000 },
+	'o4-mini-deep-research': { input: 2.00 / 1_000_000, cachedInput: 0.50 / 1_000_000, output: 8.00 / 1_000_000 },
+	'o3-mini': { input: 1.10 / 1_000_000, cachedInput: 0.55 / 1_000_000, output: 4.40 / 1_000_000 },
+	'o1-mini': { input: 1.10 / 1_000_000, cachedInput: 0.55 / 1_000_000, output: 4.40 / 1_000_000 },
+};
+
+const MODEL_PRICES: Record<ServiceTier, Record<string, { input: number; cachedInput: number; output: number }>> = {
+	flex: FLEX_PRICES,
+	standard: STANDARD_PRICES,
+};
+
+export function hasKnownPrices(model: string | null | undefined, tier: ServiceTier = 'flex'): boolean {
+	const name = model || 'gpt-5.2';
+	return name in MODEL_PRICES[tier];
+}
 
 export function extractCachedTokens(
 	inputTokenDetails?: Array<Record<string, number>> | Record<string, number>,
@@ -25,8 +71,12 @@ export function calculateCost(
 	inputTokens: number,
 	outputTokens: number,
 	inputTokenDetails: Array<Record<string, number>> | Record<string, number> | undefined,
+	tier: ServiceTier = 'flex',
 ): number {
-	const prices = MODEL_PRICES[model || 'gpt-5.2'] || MODEL_PRICES['gpt-5.2']!;
+	const prices = MODEL_PRICES[tier][model || 'gpt-5.2'];
+	if (!prices) {
+		return 0;
+	}
 	const cachedInputTokens = extractCachedTokens(inputTokenDetails);
 	const fullRateInputTokens = inputTokens - cachedInputTokens;
 	return fullRateInputTokens * prices.input
@@ -40,18 +90,31 @@ class CostTracker {
 	private totalOutputTokens = 0;
 	private totalCost = 0;
 	private totalCompactionCost = 0;
+	private hasUnknownPrices = false;
+
+	public reset() {
+		this.totalInputTokens = 0;
+		this.totalCachedInputTokens = 0;
+		this.totalOutputTokens = 0;
+		this.totalCost = 0;
+		this.totalCompactionCost = 0;
+		this.hasUnknownPrices = false;
+	}
 
 	public recordTurn(
 		model: string,
 		usage: Usage,
 		compactionModel?: string,
 	) {
-		const { turnCost, compactionCost } = this.calculateUsageCosts(model, usage, compactionModel);
+		const { turnCost, compactionCost, unknownPrices } = this.calculateUsageCosts(model, usage, compactionModel);
 		this.totalInputTokens += usage.inputTokens;
 		this.totalCachedInputTokens += extractCachedTokens(usage.inputTokensDetails);
 		this.totalOutputTokens += usage.outputTokens;
 		this.totalCost += turnCost;
 		this.totalCompactionCost += compactionCost;
+		if (unknownPrices) {
+			this.hasUnknownPrices = true;
+		}
 		return turnCost + compactionCost;
 	}
 
@@ -59,18 +122,25 @@ class CostTracker {
 		model: string,
 		usage: Usage | undefined,
 		compactionModel?: string,
-	): { turnCost: number; compactionCost: number } {
+	): { turnCost: number; compactionCost: number; unknownPrices: boolean } {
 		let turnCost = 0;
 		let compactionCost = 0;
+		let unknownPrices = !hasKnownPrices(model, 'flex');
 
 		if (usage?.requestUsageEntries && usage.requestUsageEntries.length > 0) {
 			for (const entry of usage.requestUsageEntries) {
 				const isCompaction = entry.endpoint === 'responses.compact';
+				const tier: ServiceTier = isCompaction ? 'standard' : 'flex';
+				const entryModel = isCompaction ? (compactionModel || 'gpt-4o-mini') : model;
+				if (!hasKnownPrices(entryModel, tier)) {
+					unknownPrices = true;
+				}
 				const entryCost = calculateCost(
-					isCompaction ? (compactionModel || 'gpt-4o-mini') : model,
+					entryModel,
 					entry.inputTokens,
 					entry.outputTokens,
 					entry.inputTokensDetails,
+					tier,
 				);
 				if (isCompaction) {
 					compactionCost += entryCost;
@@ -79,10 +149,10 @@ class CostTracker {
 				}
 			}
 		} else if (usage) {
-			turnCost = calculateCost(model, usage.inputTokens, usage.outputTokens, usage.inputTokensDetails);
+			turnCost = calculateCost(model, usage.inputTokens, usage.outputTokens, usage.inputTokensDetails, 'flex');
 		}
 
-		return { turnCost, compactionCost };
+		return { turnCost, compactionCost, unknownPrices };
 	}
 
 	public getStatusString(
@@ -90,7 +160,14 @@ class CostTracker {
 		model: string,
 		compactionModel?: string,
 	) {
-		const { turnCost, compactionCost } = this.calculateUsageCosts(model, currentTurnUsage, compactionModel);
+		const { turnCost, compactionCost, unknownPrices } = this.calculateUsageCosts(
+			model,
+			currentTurnUsage,
+			compactionModel,
+		);
+		if (this.hasUnknownPrices || unknownPrices) {
+			return '';
+		}
 		const totalTurnCost = turnCost + compactionCost;
 		return chalk.dim(
 			`[~${chalk.cyan('$' + (this.totalCost + this.totalCompactionCost + totalTurnCost).toFixed(4))}]`,
@@ -103,17 +180,21 @@ class CostTracker {
 			const cachedStr = this.totalCachedInputTokens > 0
 				? ` (${chalk.cyan(fmt(this.totalCachedInputTokens))} cached)`
 				: '';
+			const showCost = !this.hasUnknownPrices;
 			const totalCost = this.totalCost + this.totalCompactionCost;
 			let statsStr = chalk.dim(
 				`Final session usage: ${chalk.cyan(fmt(this.totalInputTokens))} input${cachedStr}, ${
 					chalk.cyan(fmt(this.totalOutputTokens))
-				} output tokens. Total cost: ~${chalk.cyan('$' + totalCost.toFixed(4))}`,
+				} output tokens.`,
 			);
 
-			if (this.totalCompactionCost > 0) {
-				statsStr += chalk.dim(
-					` (Compaction: ${chalk.cyan('$' + this.totalCompactionCost.toFixed(4))})`,
-				);
+			if (showCost) {
+				statsStr += chalk.dim(` Total cost: ~${chalk.cyan('$' + totalCost.toFixed(4))}`);
+				if (this.totalCompactionCost > 0) {
+					statsStr += chalk.dim(
+						` (Compaction: ${chalk.cyan('$' + this.totalCompactionCost.toFixed(4))})`,
+					);
+				}
 			}
 
 			console.log(statsStr);

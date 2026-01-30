@@ -4,6 +4,18 @@ import { openai } from '@ai-sdk/openai';
 import { aisdk } from '@openai/agents-extensions';
 import { createOllama, ollama } from 'ollama-ai-provider-v2';
 
+export function isOpenAIModel(modelName: string | null): boolean {
+	if (!modelName || modelName === 'gpt-5.2') {
+		return true;
+	}
+
+	return (
+		!modelName.startsWith('claude-')
+		&& !modelName.startsWith('gemini-')
+		&& !modelName.startsWith('ollama-')
+	);
+}
+
 export function getModel(modelName: string | null, defaultModel: string = 'gpt-5.2') {
 	if (!modelName || modelName === 'gpt-5.2') {
 		return defaultModel;

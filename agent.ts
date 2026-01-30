@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import 'dotenv/config';
-import { Agent, MemorySession, OpenAIResponsesCompactionSession, run } from '@openai/agents';
+import { Agent, MemorySession, OpenAIResponsesCompactionSession, run, type Session } from '@openai/agents';
 import chalk from 'chalk';
-import { getModel } from './lifecycle/getModel';
+import { getModel, isOpenAIModel } from './lifecycle/getModel';
 import { parseArgs } from './lifecycle/parseArgs';
 import { sayHi } from './lifecycle/sayHi';
 import { trackCompaction } from './lifecycle/trackCompaction';
@@ -48,13 +48,19 @@ async function main() {
 			},
 		},
 	});
-	const session = new OpenAIResponsesCompactionSession({
-		underlyingSession: new MemorySession(),
-		model: getModel(trackedState.compactionModel, 'gpt-4o-mini') as any, // TODO: Not sure if non-OpenAI models will work...
-	}) as OpenAIResponsesCompactionSession & {
-		runCompaction: typeof OpenAIResponsesCompactionSession.prototype.runCompaction;
-	};
-	trackCompaction(session);
+	let session: Session;
+	if (isOpenAIModel(trackedState.model)) {
+		trackCompaction(
+			session = new OpenAIResponsesCompactionSession({
+				underlyingSession: new MemorySession(),
+				model: getModel(trackedState.compactionModel, 'gpt-4o-mini') as any,
+			}) as OpenAIResponsesCompactionSession & {
+				runCompaction: typeof OpenAIResponsesCompactionSession.prototype.runCompaction;
+			},
+		);
+	} else {
+		session = new MemorySession();
+	}
 
 	while (true) {
 		let task: string = '';

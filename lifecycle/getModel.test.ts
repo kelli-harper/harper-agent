@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getModel } from './getModel';
+import { getModel, isOpenAIModel } from './getModel';
 
 // Mocking the dependencies
 vi.mock('@ai-sdk/anthropic', () => ({ anthropic: vi.fn((name) => ({ name, provider: 'anthropic' })) }));
@@ -50,5 +50,31 @@ describe('getModel', () => {
 		expect(result.wrapped.provider).toBe('ollama-custom');
 		expect(result.wrapped.name).toBe('llama3');
 		delete process.env.OLLAMA_BASE_URL;
+	});
+
+	describe('isOpenAIModel', () => {
+		it('should return true for null', () => {
+			expect(isOpenAIModel(null)).toBe(true);
+		});
+
+		it('should return true for gpt-5.2', () => {
+			expect(isOpenAIModel('gpt-5.2')).toBe(true);
+		});
+
+		it('should return true for gpt-4o', () => {
+			expect(isOpenAIModel('gpt-4o')).toBe(true);
+		});
+
+		it('should return false for claude- models', () => {
+			expect(isOpenAIModel('claude-3-sonnet')).toBe(false);
+		});
+
+		it('should return false for gemini- models', () => {
+			expect(isOpenAIModel('gemini-pro')).toBe(false);
+		});
+
+		it('should return false for ollama- models', () => {
+			expect(isOpenAIModel('ollama-llama3')).toBe(false);
+		});
 	});
 });
