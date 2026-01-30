@@ -24,6 +24,13 @@ process.on('SIGINT', handleExit);
 process.on('SIGTERM', handleExit);
 
 async function main() {
+	process.on('SIGINT', () => {
+		spinner.stop();
+		costTracker.logFinalStats();
+		cleanUpAndSayBye();
+		process.exit(0);
+	});
+
 	await checkForUpdate();
 	parseArgs();
 	await ensureApiKey();
@@ -146,40 +153,36 @@ async function main() {
 								: '()';
 							console.log(`\n${chalk.yellow('🛠️')}  ${chalk.cyan(name)}${chalk.dim(displayedArgs)}`);
 							trackedState.atStartOfLine = true;
-							spinner.start();
+							if (!stream.interruptions?.length) {
+								spinner.start();
+							}
 						}
 						break;
 				}
 
-				if (stream.interruptions?.length) {
-					for (const interruption of stream.interruptions) {
-						if (interruption.rawItem.type !== 'function_call') {
-							throw new Error(
-								'Invalid interruption type: ' + interruption.rawItem.type,
-							);
-						}
+				// No break here - let the stream finish naturally so we can capture all events
+				// and potential multiple interruptions in one turn.
+			}
 
-						spinner.stop();
+			if (stream.interruptions?.length) {
+				for (const interruption of stream.interruptions) {
+					spinner.stop();
 
-						console.log(
-							chalk.bold.bgYellow.black('\nTool approval required (see above):'),
-						);
+					console.log(
+						chalk.bold.bgYellow.black('\nTool approval required (see above):'),
+					);
 
-						const answer = await askQuestion(`\tProceed? [y/N] `);
-						const approved = answer.trim().toLowerCase();
+					const answer = await askQuestion(`\tProceed? [y/N] `);
+					const approved = answer.trim().toLowerCase();
 
-						spinner.start();
-
-						const ok = approved === 'y' || approved === 'yes' || approved === 'ok' || approved === 'k';
-						if (ok) {
-							stream.state.approve(interruption);
-						} else {
-							stream.state.reject(interruption);
-						}
+					const ok = approved === 'y' || approved === 'yes' || approved === 'ok' || approved === 'k';
+					if (ok) {
+						stream.state.approve(interruption);
+					} else {
+						stream.state.reject(interruption);
 					}
-					trackedState.approvalState = stream.state;
-					break;
 				}
+				trackedState.approvalState = stream.state;
 			}
 			spinner.stop();
 			if (!trackedState.atStartOfLine || hasStartedResponse) {

@@ -49,7 +49,7 @@ You're ready to go!
 > hairper
 
 Working directory: /Users/dawson/Code/softwork-beats
-Harper app detected in it: Yes
+Harper app detected: Yes
 Press Ctrl+C or hit enter twice to exit.
 
 Harper: What do you want to do together today?

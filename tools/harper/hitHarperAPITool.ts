@@ -17,7 +17,11 @@ export const hitHarperAPITool = tool({
 	name: 'hitHarperAPITool',
 	description: 'Performs a request against the running Harper API. Use /openapi to look up Harper APIs.',
 	parameters: ToolParameters,
-	needsApproval: async (_runContext, input, _callId) => {
+	needsApproval: async (runContext, input, callId) => {
+		if (callId && runContext.isToolApproved({ toolName: 'hitHarperAPITool', callId })) {
+			return false;
+		}
+
 		if (input.method === 'DELETE') {
 			const segments = (input.path || '').split('/').filter(Boolean);
 			if (segments.length <= 1) {

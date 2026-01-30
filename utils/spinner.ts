@@ -1,5 +1,4 @@
 import process from 'node:process';
-import { createInterface, Interface } from 'node:readline';
 import { trackedState } from '../lifecycle/trackedState';
 import { harperResponse } from './harperResponse';
 
@@ -9,14 +8,7 @@ class Spinner {
 	private i = 0;
 	public message: string;
 	public status = '';
-	private rl: Interface | null = null;
-
-	private readonly checkLine = (line: string) => {
-		if (line === '') {
-			this.rl?.close();
-			this.interrupt();
-		}
-	};
+	private onData: ((data: Buffer) => void) | null = null;
 
 	constructor(message: string = 'Thinking...') {
 		this.message = message;
@@ -31,12 +23,17 @@ class Spinner {
 			return;
 		}
 
-		this.rl = createInterface({
-			input: process.stdin,
-			output: process.stdout,
-			terminal: false,
-		});
-		this.rl.on('line', this.checkLine);
+		this.onData = (data: Buffer) => {
+			const str = data.toString();
+			if (str.includes('\n') || str.includes('\r')) {
+				this.interrupt();
+			}
+		};
+
+		process.stdin.on('data', this.onData);
+		if (process.stdin.isTTY) {
+			process.stdin.resume();
+		}
 
 		this.i = 0;
 		process.stdout.write(`${this.chars[this.i]} ${this.message}${this.status ? ' ' + this.status : ''}\x1b[K`);
@@ -58,8 +55,12 @@ class Spinner {
 	stop() {
 		if (!this.interval) { return; }
 		clearInterval(this.interval);
-		this.rl?.close();
-		this.rl = null;
+
+		if (this.onData) {
+			process.stdin.removeListener('data', this.onData);
+			this.onData = null;
+		}
+
 		this.interval = null;
 		this.status = '';
 		process.stdout.write('\r\x1b[K');

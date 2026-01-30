@@ -1,12 +1,13 @@
-import { codeInterpreterTool } from '@openai/agents';
 import { createApplyPatchTool } from './files/applyPatchTool';
 import { egrepTool } from './files/egrepTool';
 import { findTool } from './files/findTool';
 import { readDirTool } from './files/readDirTool';
 import { readFileTool } from './files/readFileTool';
+import { codeInterpreterTool } from './general/codeInterpreterTool';
+import { setInterpreterAutoApproveTool } from './general/setInterpreterAutoApproveTool';
 import { setPatchAutoApproveTool } from './general/setPatchAutoApproveTool';
 import { setShellAutoApproveTool } from './general/setShellAutoApproveTool';
-import { shellTool } from './general/shell';
+import { shellTool } from './general/shellTool';
 import { webTool } from './general/web';
 import { gitAddTool } from './git/gitAddTool';
 import { gitBranchTool } from './git/gitBranchTool';
@@ -30,7 +31,7 @@ import { stopHarperTool } from './harper/stopHarperTool';
 export function createTools() {
 	return [
 		checkHarperStatusTool,
-		codeInterpreterTool(),
+		codeInterpreterTool,
 		createApplyPatchTool(),
 		createNewHarperApplicationTool,
 		egrepTool,
@@ -51,6 +52,7 @@ export function createTools() {
 		readDirTool,
 		readFileTool,
 		readHarperLogsTool,
+		setInterpreterAutoApproveTool,
 		setPatchAutoApproveTool,
 		setShellAutoApproveTool,
 		shellTool,

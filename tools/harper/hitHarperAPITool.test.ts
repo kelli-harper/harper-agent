@@ -4,7 +4,9 @@ import { hitHarperAPITool } from './hitHarperAPITool';
 
 describe('hitHarperAPITool needsApproval', () => {
 	// @ts-expect-error - simple mock context
-	const runContext: RunContext = {};
+	const runContext: RunContext = {
+		isToolApproved: () => false,
+	} as any;
 
 	it('should return false for GET requests', async () => {
 		const result = await hitHarperAPITool.needsApproval(
