@@ -16,7 +16,12 @@ import { ensureApiKey } from './utils/ensureApiKey';
 import { harperResponse } from './utils/harperResponse';
 import { spinner } from './utils/spinner';
 
+import { handleExit } from './utils/handleExit';
+
 const argumentTruncationPoint = 100;
+
+process.on('SIGINT', handleExit);
+process.on('SIGTERM', handleExit);
 
 async function main() {
 	await checkForUpdate();
@@ -54,9 +59,7 @@ async function main() {
 			if (!task) {
 				trackedState.emptyLines += 1;
 				if (trackedState.emptyLines >= 2) {
-					costTracker.logFinalStats();
-					cleanUpAndSayBye();
-					break;
+					handleExit();
 				}
 				continue;
 			}

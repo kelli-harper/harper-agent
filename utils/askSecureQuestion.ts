@@ -1,7 +1,6 @@
 import { createInterface } from 'node:readline/promises';
 import { Writable } from 'node:stream';
-import { cleanUpAndSayBye } from './cleanUpAndSayBye';
-import { costTracker } from './cost';
+import { handleExit } from './handleExit';
 
 export async function askSecureQuestion(query: string): Promise<string> {
 	let muted = false;
@@ -20,12 +19,7 @@ export async function askSecureQuestion(query: string): Promise<string> {
 		terminal: true,
 	});
 
-	rl.on('SIGINT', () => {
-		costTracker.logFinalStats();
-		cleanUpAndSayBye();
-		rl.close();
-		process.exit(0);
-	});
+	rl.on('SIGINT', handleExit);
 
 	try {
 		const responsePromise = rl.question(query);
