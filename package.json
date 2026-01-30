@@ -9,6 +9,7 @@
 	},
 	"homepage": "https://github.com/harperfast",
 	"scripts": {
+		"dev": "tsup agent.ts --format esm --clean --dts --watch",
 		"build": "tsup agent.ts --format esm --clean --dts",
 		"commitlint": "commitlint --edit",
 		"start": "node ./dist/agent.js",
