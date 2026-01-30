@@ -8,7 +8,6 @@ import { setInterpreterAutoApproveTool } from './general/setInterpreterAutoAppro
 import { setPatchAutoApproveTool } from './general/setPatchAutoApproveTool';
 import { setShellAutoApproveTool } from './general/setShellAutoApproveTool';
 import { shellTool } from './general/shellTool';
-import { webTool } from './general/web';
 import { gitAddTool } from './git/gitAddTool';
 import { gitBranchTool } from './git/gitBranchTool';
 import { gitCommitTool } from './git/gitCommitTool';
@@ -58,6 +57,5 @@ export function createTools() {
 		shellTool,
 		startHarperTool,
 		stopHarperTool,
-		webTool,
 	];
 }
