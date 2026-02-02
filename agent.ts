@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { Agent, run } from '@openai/agents';
 import chalk from 'chalk';
 import { cleanUpAndSayBye } from './lifecycle/cleanUpAndSayBye';
-import { getModel } from './lifecycle/getModel';
+import { getModel, isOpenAIModel } from './lifecycle/getModel';
 import { parseArgs } from './lifecycle/parseArgs';
 import { sayHi } from './lifecycle/sayHi';
 import { trackedState } from './lifecycle/trackedState';
@@ -37,11 +37,12 @@ async function main() {
 
 	const { name, instructions } = sayHi();
 
+	const shouldNormalize = !isOpenAIModel(trackedState.model);
 	const agent = new Agent({
 		name,
 		model: getModel(trackedState.model),
 		instructions,
-		tools: createTools(),
+		tools: createTools(shouldNormalize),
 		modelSettings: {
 			providerData: {
 				service_tier: 'flex',

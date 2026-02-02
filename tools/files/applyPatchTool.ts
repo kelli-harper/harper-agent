@@ -13,8 +13,8 @@ const ApplyPatchParameters = z.object({
 	),
 });
 
-export function createApplyPatchTool() {
-	const editor = new WorkspaceEditor(process.cwd());
+export function createApplyPatchTool(shouldNormalize: boolean = true) {
+	const editor = new WorkspaceEditor(process.cwd(), shouldNormalize);
 	return tool({
 		name: 'apply_patch',
 		description: 'Applies a patch (create, update, or delete a file) to the workspace.',

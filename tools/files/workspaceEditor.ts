@@ -7,16 +7,18 @@ import { resolvePath } from '../../utils/files/paths';
 
 export class WorkspaceEditor implements Editor {
 	private readonly root: string;
+	private readonly shouldNormalize: boolean;
 
-	constructor(root: string) {
+	constructor(root: string, shouldNormalize: boolean = true) {
 		this.root = root;
+		this.shouldNormalize = shouldNormalize;
 	}
 
 	async createFile(operation: CreateFileOperation): Promise<ApplyPatchResult | void> {
 		try {
 			const targetPath = resolvePath(this.root, operation.path);
 			await mkdir(path.dirname(targetPath), { recursive: true });
-			const normalizedDiff = normalizeDiff(operation.diff);
+			const normalizedDiff = this.shouldNormalize ? normalizeDiff(operation.diff) : operation.diff;
 			const content = applyDiff('', normalizedDiff, 'create');
 			await writeFile(targetPath, content, 'utf8');
 			return { status: 'completed', output: `Created ${operation.path}` };
@@ -34,7 +36,7 @@ export class WorkspaceEditor implements Editor {
 			}
 			throw error;
 		});
-		const normalizedDiff = normalizeDiff(operation.diff);
+		const normalizedDiff = this.shouldNormalize ? normalizeDiff(operation.diff) : operation.diff;
 		const patched = applyDiff(original, normalizedDiff);
 		await writeFile(targetPath, patched, 'utf8');
 		return { status: 'completed', output: `Updated ${operation.path}` };
