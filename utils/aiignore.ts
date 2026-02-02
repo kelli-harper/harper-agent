@@ -68,7 +68,3 @@ export function isIgnored(filePath: string): boolean {
 		});
 	});
 }
-
-export function filterIgnored(files: string[]): string[] {
-	return files.filter(file => !isIgnored(file));
-}
