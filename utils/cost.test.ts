@@ -84,7 +84,8 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
+				requestUsageEntries: [],
 			};
 			const cost = costTracker.recordTurn('gpt-5.2', usage);
 			expect(cost).toBeGreaterThan(0);
@@ -95,19 +96,23 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
 				requestUsageEntries: [
 					{
 						endpoint: 'responses.compact',
 						inputTokens: 500,
 						outputTokens: 50,
-						inputTokensDetails: {},
+						totalTokens: 550,
+						inputTokensDetails: [] as any,
+						outputTokensDetails: [] as any,
 					},
 					{
 						endpoint: 'chat.completions',
 						inputTokens: 500,
 						outputTokens: 50,
-						inputTokensDetails: {},
+						totalTokens: 550,
+						inputTokensDetails: [] as any,
+						outputTokensDetails: [] as any,
 					},
 				],
 			};
@@ -121,7 +126,8 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
+				requestUsageEntries: [],
 			};
 			const status = costTracker.getStatusString(usage, 'ollama-llama3');
 			expect(status).toBe('');
@@ -132,13 +138,15 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
 				requestUsageEntries: [
 					{
 						endpoint: 'responses.compact',
 						inputTokens: 500,
 						outputTokens: 50,
-						inputTokensDetails: {},
+						totalTokens: 550,
+						inputTokensDetails: [] as any,
+						outputTokensDetails: [] as any,
 					},
 				],
 			};
@@ -151,7 +159,8 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
+				requestUsageEntries: [],
 			};
 			costTracker.recordTurn('ollama-llama3', usage);
 
@@ -169,7 +178,8 @@ describe('cost utilities', () => {
 			const usage = {
 				inputTokens: 1000,
 				outputTokens: 100,
-				inputTokensDetails: {},
+				inputTokensDetails: [],
+				requestUsageEntries: [],
 			};
 			costTracker.recordTurn('gpt-5.2', usage);
 

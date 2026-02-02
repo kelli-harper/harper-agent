@@ -103,7 +103,7 @@ class CostTracker {
 
 	public recordTurn(
 		model: string,
-		usage: Usage,
+		usage: Pick<Usage, 'requestUsageEntries' | 'outputTokens' | 'inputTokens' | 'inputTokensDetails'>,
 		compactionModel?: string,
 	) {
 		const { turnCost, compactionCost, unknownPrices } = this.calculateUsageCosts(model, usage, compactionModel);
@@ -120,7 +120,7 @@ class CostTracker {
 
 	private calculateUsageCosts(
 		model: string,
-		usage: Usage | undefined,
+		usage: Pick<Usage, 'requestUsageEntries' | 'outputTokens' | 'inputTokens' | 'inputTokensDetails'> | undefined,
 		compactionModel?: string,
 	): { turnCost: number; compactionCost: number; unknownPrices: boolean } {
 		let turnCost = 0;
@@ -156,7 +156,9 @@ class CostTracker {
 	}
 
 	public getStatusString(
-		currentTurnUsage: Usage | undefined,
+		currentTurnUsage:
+			| Pick<Usage, 'requestUsageEntries' | 'outputTokens' | 'inputTokens' | 'inputTokensDetails'>
+			| undefined,
 		model: string,
 		compactionModel?: string,
 	) {
