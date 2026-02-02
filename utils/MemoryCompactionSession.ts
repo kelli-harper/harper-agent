@@ -30,7 +30,7 @@ export class MemoryCompactionSession implements OpenAIResponsesCompactionAwareSe
 
 	constructor(options: MemoryCompactionSessionOptions) {
 		this.underlyingSession = options.underlyingSession ?? new MemorySession();
-		this.threshold = options.threshold ?? 10;
+		this.threshold = options.threshold ?? 20;
 		this.model = options.model;
 	}
 
