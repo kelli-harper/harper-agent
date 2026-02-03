@@ -8,6 +8,7 @@ export interface TrackedState {
 	sessionPath: string | null;
 	useFlexTier: boolean;
 	disableSpinner: boolean;
+	enableInterruptions: boolean; // whether stdin can interrupt model runs
 }
 
 export const trackedState: TrackedState = {
@@ -20,4 +21,5 @@ export const trackedState: TrackedState = {
 	sessionPath: null,
 	useFlexTier: false,
 	disableSpinner: false,
+	enableInterruptions: true,
 };

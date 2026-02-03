@@ -49,6 +49,11 @@ export function parseArgs() {
 			trackedState.useFlexTier = true;
 		} else if (arg === '--no-spinner' || arg === '--disable-spinner') {
 			trackedState.disableSpinner = true;
+		} else if (
+			arg === '--no-interrupt' || arg === '--no-interrupts' || arg === '--no-interruptions'
+			|| arg === '--disable-interrupt' || arg === '--disable-interrupts' || arg === '--disable-interruptions'
+		) {
+			trackedState.enableInterruptions = false;
 		}
 	}
 
@@ -78,6 +83,20 @@ export function parseArgs() {
 			|| process.env.HAIRPER_DISABLE_SPINNER === 'true' || process.env.HAIRPER_DISABLE_SPINNER === '1')
 	) {
 		trackedState.disableSpinner = true;
+	}
+
+	// Interruption control via env (default is enabled)
+	if (
+		process.env.HAIRPER_DISABLE_INTERRUPTION === 'true' || process.env.HAIRPER_DISABLE_INTERRUPTION === '1'
+		|| process.env.HAIRPER_DISABLE_INTERRUPTIONS === 'true' || process.env.HAIRPER_DISABLE_INTERRUPTIONS === '1'
+	) {
+		trackedState.enableInterruptions = false;
+	}
+	if (
+		process.env.HAIRPER_ENABLE_INTERRUPTION === 'false' || process.env.HAIRPER_ENABLE_INTERRUPTION === '0'
+		|| process.env.HAIRPER_ENABLE_INTERRUPTIONS === 'false' || process.env.HAIRPER_ENABLE_INTERRUPTIONS === '0'
+	) {
+		trackedState.enableInterruptions = false;
 	}
 
 	// If no model was provided, select a sensible default based on available provider env keys

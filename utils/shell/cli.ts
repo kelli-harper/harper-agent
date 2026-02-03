@@ -41,6 +41,14 @@ ${chalk.bold('OPTIONS')}
   --flex-tier             Force the use of the flex service tier for lower costs but potentially 
                           more errors under high system load.
                           Can also be set via HAIRPER_FLEX_TIER=true environment variable.
+  --no-spinner            Disable the thinking spinner (also: --disable-spinner)
+                          Can also be set via HAIRPER_NO_SPINNER=1 or HAIRPER_DISABLE_SPINNER=1.
+  --no-interruptions      Disable stdin-based interruption logic
+                          Aliases: --no-interrupt, --no-interrupts, --disable-interrupt,
+                                   --disable-interrupts, --disable-interruptions
+                          Env: set HAIRPER_DISABLE_INTERRUPTION=1 or HAIRPER_DISABLE_INTERRUPTIONS=1
+                               (default interruptions are enabled). You can also set
+                               HAIRPER_ENABLE_INTERRUPTION=0 or HAIRPER_ENABLE_INTERRUPTIONS=0.
 
 ${chalk.bold('COMMANDS')}
   help           Show help information

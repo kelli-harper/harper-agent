@@ -28,16 +28,19 @@ class Spinner {
 			return;
 		}
 
-		this.onData = (data: Buffer) => {
-			const str = data.toString();
-			if (str.includes('\n') || str.includes('\r')) {
-				this.interrupt();
-			}
-		};
+		// Attach interruption listener only when interruption logic is enabled
+		if (trackedState.enableInterruptions) {
+			this.onData = (data: Buffer) => {
+				const str = data.toString();
+				if (str.includes('\n') || str.includes('\r')) {
+					this.interrupt();
+				}
+			};
 
-		process.stdin.on('data', this.onData);
-		if (process.stdin.isTTY) {
-			process.stdin.resume();
+			process.stdin.on('data', this.onData);
+			if (process.stdin.isTTY) {
+				process.stdin.resume();
+			}
 		}
 
 		if (disabled) {
@@ -56,6 +59,10 @@ class Spinner {
 	}
 
 	interrupt() {
+		// If interruptions are disabled, ignore input signals
+		if (!trackedState.enableInterruptions) {
+			return;
+		}
 		if (trackedState.controller) {
 			this.stop();
 			trackedState.controller.abort();
