@@ -40,5 +40,5 @@
 		"moduleDetection": "force",
 		"skipLibCheck": true
 	},
-	"exclude": ["**/*.test.ts", "node_modules", "dist"]
+	"exclude": ["**/*.test.ts", "test.e2e", "node_modules", "dist"]
 }

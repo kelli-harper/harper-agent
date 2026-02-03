@@ -22,6 +22,7 @@
 		"test": "vitest --run",
 		"test:coverage": "vitest run --coverage",
 		"test:watch": "vitest",
+		"test:e2e": "vitest -c vitest.e2e.config.ts run",
 		"prepublishOnly": "npm run build"
 	},
 	"bin": {
