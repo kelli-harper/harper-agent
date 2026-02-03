@@ -10,6 +10,7 @@ import { trackedState } from './lifecycle/trackedState';
 import { createTools } from './tools/factory';
 import { checkForUpdate } from './utils/package/checkForUpdate';
 import { costTracker } from './utils/sessions/cost';
+import { modelSettings } from './utils/sessions/modelSettings';
 import { askQuestion } from './utils/shell/askQuestion';
 import { ensureApiKey } from './utils/shell/ensureApiKey';
 import { harperResponse } from './utils/shell/harperResponse';
@@ -41,13 +42,9 @@ async function main() {
 	const agent = new Agent({
 		name,
 		model: isOpenAIModel(trackedState.model) ? trackedState.model : getModel(trackedState.model),
+		modelSettings,
 		instructions,
 		tools: createTools(shouldNormalize),
-		modelSettings: {
-			providerData: {
-				service_tier: trackedState.useFlexTier ? 'flex' : 'auto',
-			},
-		},
 	});
 	const session = createSession(trackedState.compactionModel, trackedState.sessionPath);
 
