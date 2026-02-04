@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { SystemMessageItem, UserMessageItem } from '@openai/agents';
+import { type SystemMessageItem, type UserMessageItem } from '@openai/agents';
 import { beforeAll, describe, expect, test } from 'vitest';
 import { parseArgs } from '../lifecycle/parseArgs';
 import { trackedState } from '../lifecycle/trackedState';
