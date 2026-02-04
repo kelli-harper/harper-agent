@@ -7,6 +7,15 @@ const execAsync = promisify(exec);
 
 export class LocalShell implements Shell {
 	private readonly cwd: string = process.cwd();
+	private readonly defaultTimeoutMs: number;
+
+	constructor(options?: { defaultTimeoutMs?: number }) {
+		const envValRaw = process.env.SHELL_DEFAULT_TIMEOUT_MS;
+		const envVal = envValRaw !== undefined ? Number(envValRaw) : undefined;
+		this.defaultTimeoutMs = options?.defaultTimeoutMs ?? (
+			envVal !== undefined && !Number.isNaN(envVal) ? envVal : 20_000
+		);
+	}
 
 	async run(action: ShellAction): Promise<ShellResult> {
 		const output: ShellResult['output'] = [];
@@ -24,7 +33,8 @@ export class LocalShell implements Shell {
 					command,
 					{
 						cwd: this.cwd,
-						timeout: action.timeoutMs,
+						// Prefer per-call timeout, else default
+						timeout: action.timeoutMs ?? this.defaultTimeoutMs,
 						maxBuffer: action.maxOutputLength,
 					},
 				);
