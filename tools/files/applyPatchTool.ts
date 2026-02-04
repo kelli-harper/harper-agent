@@ -17,13 +17,17 @@ const ApplyPatchParameters = z.object({
 
 export function createApplyPatchTool() {
 	const isOpenAI = isOpenAIModel(trackedState.model);
-	const editor = new WorkspaceEditor(() => trackedState.cwd, !isOpenAI);
+	const editor = new WorkspaceEditor(() => trackedState.cwd);
 
 	const needsApproval = async (
-		_runContext: RunContext,
+		runContext: RunContext,
 		operation: z.infer<typeof ApplyPatchParameters>,
-		_callId?: string,
+		callId?: string,
 	) => {
+		if (callId && runContext.isToolApproved({ toolName: 'apply_patch', callId })) {
+			return false;
+		}
+
 		const autoApproved = process.env.APPLY_PATCH_AUTO_APPROVE === '1';
 
 		spinner.stop();
