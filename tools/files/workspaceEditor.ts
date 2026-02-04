@@ -7,17 +7,17 @@ import { normalizeDiff } from '../../utils/files/normalizeDiff';
 import { resolvePath } from '../../utils/files/paths';
 
 export class WorkspaceEditor implements Editor {
-	private readonly root: string;
+	private readonly root: () => string;
 	private readonly shouldNormalize: boolean;
 
-	constructor(root: string, shouldNormalize: boolean) {
+	constructor(root: () => string, shouldNormalize: boolean) {
 		this.root = root;
 		this.shouldNormalize = shouldNormalize;
 	}
 
 	async createFile(operation: CreateFileOperation): Promise<ApplyPatchResult | void> {
 		try {
-			const targetPath = resolvePath(this.root, operation.path);
+			const targetPath = resolvePath(this.root(), operation.path);
 			await mkdir(path.dirname(targetPath), { recursive: true });
 			const normalizedDiff = this.shouldNormalize ? normalizeDiff(operation.diff) : operation.diff;
 			const content = applyDiff('', normalizedDiff, 'create');
@@ -30,7 +30,7 @@ export class WorkspaceEditor implements Editor {
 	}
 
 	async updateFile(operation: UpdateFileOperation): Promise<ApplyPatchResult | void> {
-		const targetPath = resolvePath(this.root, operation.path);
+		const targetPath = resolvePath(this.root(), operation.path);
 		if (!existsSync(targetPath)) {
 			return { status: 'failed', output: 'Error: file not found at path ' + targetPath };
 		}
@@ -42,7 +42,7 @@ export class WorkspaceEditor implements Editor {
 	}
 
 	async deleteFile(operation: DeleteFileOperation): Promise<ApplyPatchResult | void> {
-		const targetPath = resolvePath(this.root, operation.path);
+		const targetPath = resolvePath(this.root(), operation.path);
 		if (!existsSync(targetPath)) {
 			return { status: 'failed', output: 'Error: file not found at path ' + targetPath };
 		}

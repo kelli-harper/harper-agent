@@ -30,7 +30,7 @@ describe('WorkspaceEditor', () => {
 
 	describe('updateFile', () => {
 		it('should normalize diff by default', async () => {
-			const editor = new WorkspaceEditor('/root', true);
+			const editor = new WorkspaceEditor(() => '/root', true);
 			await editor.updateFile({ type: 'update_file', path: 'test.txt', diff: 'some diff' });
 
 			expect(normalizeDiff).toHaveBeenCalledWith('some diff');
@@ -38,7 +38,7 @@ describe('WorkspaceEditor', () => {
 		});
 
 		it('should normalize diff when shouldNormalize is true', async () => {
-			const editor = new WorkspaceEditor('/root', true);
+			const editor = new WorkspaceEditor(() => '/root', true);
 			await editor.updateFile({ type: 'update_file', path: 'test.txt', diff: 'some diff' });
 
 			expect(normalizeDiff).toHaveBeenCalledWith('some diff');
@@ -46,7 +46,7 @@ describe('WorkspaceEditor', () => {
 		});
 
 		it('should NOT normalize diff when shouldNormalize is false', async () => {
-			const editor = new WorkspaceEditor('/root', false);
+			const editor = new WorkspaceEditor(() => '/root', false);
 			await editor.updateFile({ type: 'update_file', path: 'test.txt', diff: 'some diff' });
 
 			expect(normalizeDiff).not.toHaveBeenCalled();
@@ -56,7 +56,7 @@ describe('WorkspaceEditor', () => {
 
 	describe('createFile', () => {
 		it('should normalize diff by default', async () => {
-			const editor = new WorkspaceEditor('/root', true);
+			const editor = new WorkspaceEditor(() => '/root', true);
 			await editor.createFile({ type: 'create_file', path: 'new.txt', diff: 'new diff' });
 
 			expect(normalizeDiff).toHaveBeenCalledWith('new diff');
@@ -64,7 +64,7 @@ describe('WorkspaceEditor', () => {
 		});
 
 		it('should NOT normalize diff when shouldNormalize is false', async () => {
-			const editor = new WorkspaceEditor('/root', false);
+			const editor = new WorkspaceEditor(() => '/root', false);
 			await editor.createFile({ type: 'create_file', path: 'new.txt', diff: 'new diff' });
 
 			expect(normalizeDiff).not.toHaveBeenCalled();
