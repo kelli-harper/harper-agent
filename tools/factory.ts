@@ -1,4 +1,5 @@
 import { createApplyPatchTool } from './files/applyPatchTool';
+import { changeCwdTool } from './files/changeCwdTool';
 import { egrepTool } from './files/egrepTool';
 import { findTool } from './files/findTool';
 import { readDirTool } from './files/readDirTool';
@@ -29,6 +30,7 @@ import { stopHarperTool } from './harper/stopHarperTool';
 
 export function createTools() {
 	return [
+		changeCwdTool,
 		checkHarperStatusTool,
 		codeInterpreterTool,
 		createApplyPatchTool(),

@@ -4,6 +4,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { trackedState } from '../../lifecycle/trackedState';
 import { resolvePath } from '../../utils/files/paths';
+import { execute as changeCwd } from '../files/changeCwdTool';
 
 const ToolParameters = z.object({
 	directoryName: z
@@ -37,7 +38,10 @@ export async function execute({ directoryName, template }: z.infer<typeof ToolPa
 		console.log(`Initializing new Git repository in ${resolvedPath}...`);
 		execSync('git init', { cwd: resolvedPath, stdio: 'ignore' });
 
-		return `Successfully created new Harper application in '${resolvedPath}' using template '${template}'.\n\nCommand Output:\n${output}\n\nInitialized Git repository.`;
+		// Automatically switch into the newly created app directory
+		const switchedDir = await changeCwd({ path: resolvedPath } as any);
+
+		return `Successfully created new Harper application in '${resolvedPath}' using template '${template}'.\n\nCommand Output:\n${output}\n\nInitialized Git repository.\n\n${switchedDir}`;
 	} catch (error: any) {
 		let errorMsg = `Error creating new Harper application: ${error.message}`;
 		if (error.stdout) {
