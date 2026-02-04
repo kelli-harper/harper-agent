@@ -47,6 +47,8 @@ async function main() {
 
 	while (true) {
 		let task: string = '';
+		// Track the last tool call so we can include context if an error happens
+		let lastToolCallInfo: string | null = null;
 
 		trackedState.controller = new AbortController();
 
@@ -144,6 +146,8 @@ async function main() {
 								? `(${args.slice(0, argumentTruncationPoint)}${args.length > argumentTruncationPoint ? '...' : ''})`
 								: '()';
 							console.log(`\n${chalk.yellow('🛠️')}  ${chalk.cyan(name)}${chalk.dim(displayedArgs)}`);
+							// Save context for potential error reporting later
+							lastToolCallInfo = `${name}${displayedArgs}`;
 							trackedState.atStartOfLine = true;
 							if (!stream.interruptions?.length) {
 								spinner.start();
@@ -197,7 +201,34 @@ async function main() {
 		} catch (error: any) {
 			spinner.stop();
 			process.stdout.write('\n');
-			harperResponse(chalk.red(`Error: ${error.message || error}`));
+			// Build a detailed error report to help diagnosis and allow the LLM/user to recover.
+			const err: any = error ?? {};
+			const name = err.name || 'Error';
+			const message: string = err.message || String(err);
+			const code = err.code ? ` code=${err.code}` : '';
+			const status = err.status || err.statusCode || err.response?.status;
+			const statusStr = status ? ` status=${status}` : '';
+			const callIdMatch = typeof message === 'string' ? message.match(/function call\s+(call_[A-Za-z0-9_-]+)/i) : null;
+			const callId = callIdMatch?.[1];
+			const isNoToolOutput = /No tool output found for function call/i.test(message || '');
+			const hint = isNoToolOutput
+				? `\nHint: A tool likely threw or returned no result. Ensure tools always return a structured object (e.g., { status, output }) and never throw. If this followed a tool call${
+					callId ? ` (${callId})` : ''
+				}${lastToolCallInfo ? `: ${lastToolCallInfo}` : ''}, review that tool's implementation and logs.`
+				: '';
+			// Include response data if present but keep it short
+			let responseDataSnippet = '';
+			const data = err.response?.data ?? err.data;
+			if (data) {
+				try {
+					const s = typeof data === 'string' ? data : JSON.stringify(data);
+					responseDataSnippet = `\nResponse data: ${s.slice(0, 500)}${s.length > 500 ? '…' : ''}`;
+				} catch {}
+			}
+			const stack = err.stack ? `\nStack: ${String(err.stack).split('\n').slice(0, 8).join('\n')}` : '';
+			const lastTool = lastToolCallInfo ? `\nLast tool call: ${lastToolCallInfo}` : '';
+			const composed = `${name}:${code}${statusStr} ${message}${hint}${lastTool}${responseDataSnippet}${stack}`;
+			harperResponse(chalk.red(composed));
 			trackedState.atStartOfLine = true;
 			trackedState.approvalState = null;
 		}
