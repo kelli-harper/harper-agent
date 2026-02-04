@@ -38,6 +38,11 @@ export class DiskSession extends MemorySession {
 			}
 		}
 
+		if (!sessionId) {
+			// This shouldn't happen if MemorySession is working correctly, but be safe
+			sessionId = (this as any).sessionId || 'default-session';
+		}
+
 		// Load existing items from the database for this session
 		const rows = await this.all<{ data: string }>(
 			'SELECT data FROM session_items WHERE sessionId = ? ORDER BY id ASC',
@@ -52,7 +57,7 @@ export class DiskSession extends MemorySession {
 		} else {
 			// If the database is empty but we have initialItems (already in this.items),
 			// we should persist them.
-			const items = (this as any).items as AgentInputItem[];
+			const items = (this as any).items as AgentInputItem[] || [];
 			if (items.length > 0) {
 				for (const item of items) {
 					await this.run('INSERT INTO session_items (sessionId, data) VALUES (?, ?)', sessionId, JSON.stringify(item));
