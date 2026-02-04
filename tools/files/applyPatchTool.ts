@@ -1,4 +1,4 @@
-import { tool } from '@openai/agents';
+import { applyPatchTool, type RunContext, tool } from '@openai/agents';
 import chalk from 'chalk';
 import { z } from 'zod';
 import { isOpenAIModel } from '../../lifecycle/getModel';
@@ -17,7 +17,39 @@ const ApplyPatchParameters = z.object({
 
 export function createApplyPatchTool() {
 	const isOpenAI = isOpenAIModel(trackedState.model);
-	const editor = new WorkspaceEditor(trackedState.cwd, !isOpenAI);
+	const editor = new WorkspaceEditor(() => trackedState.cwd, !isOpenAI);
+
+	const needsApproval = async (
+		_runContext: RunContext,
+		operation: z.infer<typeof ApplyPatchParameters>,
+		_callId?: string,
+	) => {
+		const autoApproved = process.env.APPLY_PATCH_AUTO_APPROVE === '1';
+
+		spinner.stop();
+		if (autoApproved) {
+			console.log(`\n${chalk.bold.bgGreen.black(' Apply patch (auto-approved): ')}`);
+		} else {
+			console.log(`\n${chalk.bold.bgYellow.black(' Apply patch approval required: ')}`);
+		}
+		console.log(`${chalk.bold(operation.type)}: ${operation.path}`);
+		if (operation.diff) {
+			printDiff(operation.diff);
+		}
+		if (autoApproved) {
+			spinner.start();
+		}
+
+		return !autoApproved;
+	};
+
+	if (isOpenAI) {
+		return applyPatchTool({
+			editor,
+			needsApproval: needsApproval as any,
+		});
+	}
+
 	return tool({
 		name: 'apply_patch',
 		description: 'Applies a patch (create, update, or delete a file) to the workspace.',
@@ -40,28 +72,6 @@ export function createApplyPatchTool() {
 					return `Error: Unknown operation type: ${(operation as any).type}`;
 			}
 		},
-		needsApproval: async (runContext, operation, callId) => {
-			if (callId && runContext.isToolApproved({ toolName: 'apply_patch', callId })) {
-				return false;
-			}
-
-			const autoApproved = process.env.APPLY_PATCH_AUTO_APPROVE === '1';
-
-			spinner.stop();
-			if (autoApproved) {
-				console.log(`\n${chalk.bold.bgGreen.black(' Apply patch (auto-approved): ')}`);
-			} else {
-				console.log(`\n${chalk.bold.bgYellow.black(' Apply patch approval required: ')}`);
-			}
-			console.log(`${chalk.bold(operation.type)}: ${operation.path}`);
-			if (operation.diff) {
-				printDiff(operation.diff);
-			}
-			if (autoApproved) {
-				spinner.start();
-			}
-
-			return !autoApproved;
-		},
+		needsApproval,
 	});
 }
