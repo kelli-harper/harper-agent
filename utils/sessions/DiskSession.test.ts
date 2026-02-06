@@ -2,6 +2,7 @@ import { user } from '@openai/agents';
 import { existsSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import sqlite3 from 'sqlite3';
 import { afterEach, describe, expect, it } from 'vitest';
 import { DiskSession } from './DiskSession';
 
@@ -101,5 +102,56 @@ describe('DiskSession', () => {
 		expect((await session1Reloaded.getItems())[0]).toEqual(user('hello 1'));
 		expect(await session2Reloaded.getItems()).toHaveLength(1);
 		expect((await session2Reloaded.getItems())[0]).toEqual(user('hello 2'));
+	});
+
+	it('should use JSONB for the data column', async () => {
+		const session = new DiskSession(dbPath);
+		// @ts-ignore - accessing private ready for test
+		await session.ready;
+
+		// @ts-ignore - accessing private all for test
+		const columns = await session.all('PRAGMA table_info(session_items)');
+		const dataColumn = columns.find((c: any) => c.name === 'data');
+		expect(dataColumn.type).toBe('JSONB');
+	});
+
+	it('should be backward compatible with old TEXT schema', async () => {
+		// 1. Manually create table with old schema
+		const db = new sqlite3.Database(dbPath);
+		await new Promise<void>((resolve, reject) => {
+			db.serialize(() => {
+				db.run(`
+					CREATE TABLE session_items (
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						sessionId TEXT,
+						data TEXT
+					)
+				`);
+				db.run(
+					'INSERT INTO session_items (sessionId, data) VALUES (?, ?)',
+					'old-session',
+					JSON.stringify(user('old message')),
+					(err) => err ? reject(err) : resolve(),
+				);
+			});
+		});
+		await new Promise<void>((resolve) => db.close(() => resolve()));
+
+		// 2. Open with DiskSession
+		const session = new DiskSession(dbPath, { sessionId: 'old-session' });
+		const items = await session.getItems();
+
+		// Should be able to read old data
+		expect(items).toHaveLength(1);
+		expect(items[0]).toEqual(user('old message'));
+
+		// 3. Add new data (might use JSONB if supported)
+		await session.addItems([user('new message')]);
+
+		// 4. Verify all data is readable
+		const itemsAfter = await session.getItems();
+		expect(itemsAfter).toHaveLength(2);
+		expect(itemsAfter[0]).toEqual(user('old message'));
+		expect(itemsAfter[1]).toEqual(user('new message'));
 	});
 });

@@ -8,6 +8,7 @@ import sqlite3 from 'sqlite3';
 export class DiskSession extends MemorySession {
 	private readonly db: sqlite3.Database;
 	private readonly ready: Promise<void>;
+	private useJsonb = false;
 
 	constructor(dbPath: string, options?: ConstructorParameters<typeof MemorySession>[0]) {
 		super(options);
@@ -21,9 +22,17 @@ export class DiskSession extends MemorySession {
 			CREATE TABLE IF NOT EXISTS session_items (
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				sessionId TEXT,
-				data TEXT
+				data JSONB
 			)
 		`);
+
+		// Check if jsonb is supported
+		try {
+			await this.get("SELECT jsonb('{}')");
+			this.useJsonb = true;
+		} catch {
+			this.useJsonb = false;
+		}
 
 		// sessionId is private in MemorySession, but it's set in the constructor.
 		// We can access it via the public getSessionId() or by casting to any.
@@ -45,7 +54,7 @@ export class DiskSession extends MemorySession {
 
 		// Load existing items from the database for this session
 		const rows = await this.all<{ data: string }>(
-			'SELECT data FROM session_items WHERE sessionId = ? ORDER BY id ASC',
+			'SELECT json(data) AS data FROM session_items WHERE sessionId = ? ORDER BY id ASC',
 			sessionId,
 		);
 
@@ -59,8 +68,11 @@ export class DiskSession extends MemorySession {
 			// we should persist them.
 			const items = (this as any).items as AgentInputItem[] || [];
 			if (items.length > 0) {
+				const sql = this.useJsonb
+					? 'INSERT INTO session_items (sessionId, data) VALUES (?, jsonb(?))'
+					: 'INSERT INTO session_items (sessionId, data) VALUES (?, ?)';
 				for (const item of items) {
-					await this.run('INSERT INTO session_items (sessionId, data) VALUES (?, ?)', sessionId, JSON.stringify(item));
+					await this.run(sql, sessionId, JSON.stringify(item));
 				}
 			}
 		}
@@ -85,8 +97,11 @@ export class DiskSession extends MemorySession {
 
 		// Persist to SQLite
 		const sessionId = await this.getSessionId();
+		const sql = this.useJsonb
+			? 'INSERT INTO session_items (sessionId, data) VALUES (?, jsonb(?))'
+			: 'INSERT INTO session_items (sessionId, data) VALUES (?, ?)';
 		for (const item of items) {
-			await this.run('INSERT INTO session_items (sessionId, data) VALUES (?, ?)', sessionId, JSON.stringify(item));
+			await this.run(sql, sessionId, JSON.stringify(item));
 		}
 	}
 
