@@ -10,10 +10,22 @@ function resetState() {
 	trackedState.emptyLines = 0;
 	trackedState.approvalState = null;
 	trackedState.controller = null;
-	trackedState.model = null;
-	trackedState.compactionModel = null;
+	trackedState.model = '';
+	trackedState.compactionModel = '';
 	trackedState.sessionPath = null;
 	trackedState.useFlexTier = false;
+	trackedState.disableSpinner = false;
+	trackedState.enableInterruptions = true;
+}
+
+function clearAllEnv() {
+	clearProviderEnv();
+	delete process.env.HAIRPER_NO_SPINNER;
+	delete process.env.HAIRPER_DISABLE_SPINNER;
+	delete process.env.HAIRPER_DISABLE_INTERRUPTION;
+	delete process.env.HAIRPER_DISABLE_INTERRUPTIONS;
+	delete process.env.HAIRPER_ENABLE_INTERRUPTION;
+	delete process.env.HAIRPER_ENABLE_INTERRUPTIONS;
 }
 
 function clearProviderEnv() {
@@ -33,7 +45,7 @@ describe('parseArgs defaults based on ENV provider keys', () => {
 		process.argv = ['node', 'agent.js'];
 		// copy to avoid mutating ORIGINAL_ENV reference
 		process.env = { ...ORIGINAL_ENV };
-		clearProviderEnv();
+		clearAllEnv();
 		resetState();
 	});
 
@@ -84,5 +96,233 @@ describe('parseArgs defaults based on ENV provider keys', () => {
 		process.env.ANTHROPIC_API_KEY = 'sk-ant-123';
 		parseArgs();
 		expect(trackedState.model).toBe('claude-3-7-sonnet-latest');
+	});
+});
+
+describe('parseArgs CLI arguments', () => {
+	beforeEach(() => {
+		process.argv = ['node', 'agent.js'];
+		process.env = { ...ORIGINAL_ENV };
+		clearAllEnv();
+		resetState();
+	});
+
+	it('parses model with --model', () => {
+		process.argv.push('--model', 'gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses model with -m', () => {
+		process.argv.push('-m', 'gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses model with model prefix', () => {
+		process.argv.push('model', 'gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses model with --model=', () => {
+		process.argv.push('--model=gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses model with -m=', () => {
+		process.argv.push('-m=gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses model with model=', () => {
+		process.argv.push('model=gpt-4');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('strips quotes from model argument', () => {
+		process.argv.push('--model', '"gpt-4"');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('parses compaction model with --compaction-model', () => {
+		process.argv.push('--compaction-model', 'claude-3-haiku');
+		parseArgs();
+		expect(trackedState.compactionModel).toBe('claude-3-haiku');
+	});
+
+	it('parses compaction model with -c=', () => {
+		process.argv.push('-c=claude-3-haiku');
+		parseArgs();
+		expect(trackedState.compactionModel).toBe('claude-3-haiku');
+	});
+
+	it('parses session path with --session', () => {
+		process.argv.push('--session', './my-session.json');
+		parseArgs();
+		expect(trackedState.sessionPath).toBe('./my-session.json');
+	});
+
+	it('parses session path with -s=', () => {
+		process.argv.push('-s=./my-session.json');
+		parseArgs();
+		expect(trackedState.sessionPath).toBe('./my-session.json');
+	});
+
+	it('parses boolean flag --flex-tier', () => {
+		process.argv.push('--flex-tier');
+		parseArgs();
+		expect(trackedState.useFlexTier).toBe(true);
+	});
+
+	it('parses boolean flag --no-spinner', () => {
+		process.argv.push('--no-spinner');
+		parseArgs();
+		expect(trackedState.disableSpinner).toBe(true);
+	});
+
+	it('parses boolean flag --disable-spinner', () => {
+		process.argv.push('--disable-spinner');
+		parseArgs();
+		expect(trackedState.disableSpinner).toBe(true);
+	});
+
+	it('parses boolean flag --no-interrupt', () => {
+		process.argv.push('--no-interrupt');
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+
+	it('parses boolean flag --disable-interruptions', () => {
+		process.argv.push('--disable-interruptions');
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+});
+
+describe('parseArgs Environment Variables', () => {
+	beforeEach(() => {
+		process.argv = ['node', 'agent.js'];
+		process.env = { ...ORIGINAL_ENV };
+		clearAllEnv();
+		resetState();
+	});
+
+	it('uses HAIRPER_SESSION', () => {
+		process.env.HAIRPER_SESSION = './env-session.json';
+		parseArgs();
+		expect(trackedState.sessionPath).toBe('./env-session.json');
+	});
+
+	it('uses HAIRPER_FLEX_TIER=true', () => {
+		process.env.HAIRPER_FLEX_TIER = 'true';
+		parseArgs();
+		expect(trackedState.useFlexTier).toBe(true);
+	});
+
+	it('uses HAIRPER_FLEX_TIER=1', () => {
+		process.env.HAIRPER_FLEX_TIER = '1';
+		parseArgs();
+		expect(trackedState.useFlexTier).toBe(true);
+	});
+
+	it('uses HAIRPER_NO_SPINNER=true', () => {
+		process.env.HAIRPER_NO_SPINNER = 'true';
+		parseArgs();
+		expect(trackedState.disableSpinner).toBe(true);
+	});
+
+	it('uses HAIRPER_DISABLE_INTERRUPTION=true', () => {
+		process.env.HAIRPER_DISABLE_INTERRUPTION = 'true';
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+
+	it('uses HAIRPER_ENABLE_INTERRUPTIONS=false', () => {
+		process.env.HAIRPER_ENABLE_INTERRUPTIONS = 'false';
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+
+	it('uses HAIRPER_ENABLE_INTERRUPTIONS=0', () => {
+		process.env.HAIRPER_ENABLE_INTERRUPTIONS = '0';
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+
+	it('uses HAIRPER_DISABLE_INTERRUPTIONS=1', () => {
+		process.env.HAIRPER_DISABLE_INTERRUPTIONS = '1';
+		parseArgs();
+		expect(trackedState.enableInterruptions).toBe(false);
+	});
+
+	it('CLI arg takes precedence over Env var', () => {
+		process.env.HAIRPER_MODEL = 'gpt-env';
+		process.argv.push('--model', 'gpt-cli');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-cli');
+	});
+});
+
+describe('parseArgs edge cases and mixed scenarios', () => {
+	beforeEach(() => {
+		process.argv = ['node', 'agent.js'];
+		process.env = { ...ORIGINAL_ENV };
+		clearAllEnv();
+		resetState();
+	});
+
+	it('handles multiple key-value pairs', () => {
+		process.argv.push('--model', 'gpt-4', '--session', 'sess.json', '-c=claude-3');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+		expect(trackedState.sessionPath).toBe('sess.json');
+		expect(trackedState.compactionModel).toBe('claude-3');
+	});
+
+	it('ignores missing value for prefix', () => {
+		process.argv.push('--model');
+		parseArgs();
+		// Should still be empty or default
+		expect(trackedState.model).not.toBe('--model');
+	});
+
+	it('handles empty value in prefix= by falling back to default', () => {
+		process.argv.push('--model=');
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-5.2');
+	});
+
+	it('handles single quotes in arguments', () => {
+		process.argv.push('--model', "'gpt-4'");
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-4');
+	});
+
+	it('disables OpenAI tracing for non-OpenAI models', () => {
+		process.env.ANTHROPIC_API_KEY = 'sk-ant-123';
+		delete process.env.OPENAI_AGENTS_DISABLE_TRACING;
+		parseArgs();
+		expect(trackedState.model).toBe('claude-3-7-sonnet-latest');
+		expect(process.env.OPENAI_AGENTS_DISABLE_TRACING).toBe('1');
+	});
+
+	it('does not disable OpenAI tracing for OpenAI models', () => {
+		process.env.OPENAI_API_KEY = 'sk-openai-123';
+		delete process.env.OPENAI_AGENTS_DISABLE_TRACING;
+		parseArgs();
+		expect(trackedState.model).toBe('gpt-5.2');
+		expect(process.env.OPENAI_AGENTS_DISABLE_TRACING).toBeUndefined();
+	});
+
+	it('respects existing OPENAI_AGENTS_DISABLE_TRACING', () => {
+		process.env.ANTHROPIC_API_KEY = 'sk-ant-123';
+		process.env.OPENAI_AGENTS_DISABLE_TRACING = '0';
+		parseArgs();
+		expect(process.env.OPENAI_AGENTS_DISABLE_TRACING).toBe('0');
 	});
 });

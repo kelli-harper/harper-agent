@@ -1,4 +1,6 @@
 import { handleHelp, handleVersion, isHelpRequest, isVersionRequest } from '../utils/shell/cli';
+import { isFalse } from '../utils/strings/isFalse';
+import { isTrue } from '../utils/strings/isTrue';
 import { isOpenAIModel } from './getModel';
 import { trackedState } from './trackedState';
 
@@ -21,37 +23,46 @@ export function parseArgs() {
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]!;
 
-		if (arg === '--model' || arg === '-m' || arg === 'model') {
-			if (args[i + 1]) {
-				trackedState.model = stripQuotes(args[++i]!);
+		const flagPairs = [
+			['model', ['--model', '-m', 'model']],
+			['compactionModel', ['--compaction-model', '-c', 'compaction-model']],
+			['sessionPath', ['--session', '-s', 'session']],
+		] as const;
+
+		let handled = false;
+		for (const [key, prefixes] of flagPairs) {
+			for (const prefix of prefixes) {
+				if (arg === prefix) {
+					if (args[i + 1]) {
+						trackedState[key] = stripQuotes(args[++i]!);
+					}
+					handled = true;
+					break;
+				} else if (arg.startsWith(`${prefix}=`)) {
+					trackedState[key] = stripQuotes(arg.slice(prefix.length + 1));
+					handled = true;
+					break;
+				}
 			}
-		} else if (arg.startsWith('--model=')) {
-			trackedState.model = stripQuotes(arg.slice('--model='.length));
-		} else if (arg.startsWith('model=')) {
-			trackedState.model = stripQuotes(arg.slice('model='.length));
-		} else if (arg === '--compaction-model' || arg === '-c' || arg === 'compaction-model') {
-			if (args[i + 1]) {
-				trackedState.compactionModel = stripQuotes(args[++i]!);
-			}
-		} else if (arg.startsWith('--compaction-model=')) {
-			trackedState.compactionModel = stripQuotes(arg.slice('--compaction-model='.length));
-		} else if (arg.startsWith('compaction-model=')) {
-			trackedState.compactionModel = stripQuotes(arg.slice('compaction-model='.length));
-		} else if (arg === '--session' || arg === '-s' || arg === 'session') {
-			if (args[i + 1]) {
-				trackedState.sessionPath = stripQuotes(args[++i]!);
-			}
-		} else if (arg.startsWith('--session=')) {
-			trackedState.sessionPath = stripQuotes(arg.slice('--session='.length));
-		} else if (arg.startsWith('session=')) {
-			trackedState.sessionPath = stripQuotes(arg.slice('session='.length));
-		} else if (arg === '--flex-tier') {
+			if (handled) { break; }
+		}
+
+		if (handled) { continue; }
+
+		// Handle boolean flags
+		if (arg === '--flex-tier') {
 			trackedState.useFlexTier = true;
 		} else if (arg === '--no-spinner' || arg === '--disable-spinner') {
 			trackedState.disableSpinner = true;
 		} else if (
-			arg === '--no-interrupt' || arg === '--no-interrupts' || arg === '--no-interruptions'
-			|| arg === '--disable-interrupt' || arg === '--disable-interrupts' || arg === '--disable-interruptions'
+			[
+				'--no-interrupt',
+				'--no-interrupts',
+				'--no-interruptions',
+				'--disable-interrupt',
+				'--disable-interrupts',
+				'--disable-interruptions',
+			].includes(arg)
 		) {
 			trackedState.enableInterruptions = false;
 		}
@@ -61,40 +72,29 @@ export function parseArgs() {
 	if (!trackedState.model && process.env.HAIRPER_MODEL) {
 		trackedState.model = process.env.HAIRPER_MODEL;
 	}
-
 	if (!trackedState.compactionModel && process.env.HAIRPER_COMPACTION_MODEL) {
 		trackedState.compactionModel = process.env.HAIRPER_COMPACTION_MODEL;
 	}
-
 	if (!trackedState.sessionPath && process.env.HAIRPER_SESSION) {
 		trackedState.sessionPath = process.env.HAIRPER_SESSION;
 	}
 
-	if (
-		!trackedState.useFlexTier && (process.env.HAIRPER_FLEX_TIER === 'true' || process.env.HAIRPER_FLEX_TIER === '1')
-	) {
+	if (!trackedState.useFlexTier && isTrue(process.env.HAIRPER_FLEX_TIER)) {
 		trackedState.useFlexTier = true;
 	}
 
 	// Spinner control via env
 	if (
 		!trackedState.disableSpinner
-		&& (process.env.HAIRPER_NO_SPINNER === 'true' || process.env.HAIRPER_NO_SPINNER === '1'
-			|| process.env.HAIRPER_DISABLE_SPINNER === 'true' || process.env.HAIRPER_DISABLE_SPINNER === '1')
+		&& (isTrue(process.env.HAIRPER_NO_SPINNER) || isTrue(process.env.HAIRPER_DISABLE_SPINNER))
 	) {
 		trackedState.disableSpinner = true;
 	}
 
 	// Interruption control via env (default is enabled)
 	if (
-		process.env.HAIRPER_DISABLE_INTERRUPTION === 'true' || process.env.HAIRPER_DISABLE_INTERRUPTION === '1'
-		|| process.env.HAIRPER_DISABLE_INTERRUPTIONS === 'true' || process.env.HAIRPER_DISABLE_INTERRUPTIONS === '1'
-	) {
-		trackedState.enableInterruptions = false;
-	}
-	if (
-		process.env.HAIRPER_ENABLE_INTERRUPTION === 'false' || process.env.HAIRPER_ENABLE_INTERRUPTION === '0'
-		|| process.env.HAIRPER_ENABLE_INTERRUPTIONS === 'false' || process.env.HAIRPER_ENABLE_INTERRUPTIONS === '0'
+		isTrue(process.env.HAIRPER_DISABLE_INTERRUPTION) || isTrue(process.env.HAIRPER_DISABLE_INTERRUPTIONS)
+		|| isFalse(process.env.HAIRPER_ENABLE_INTERRUPTION) || isFalse(process.env.HAIRPER_ENABLE_INTERRUPTIONS)
 	) {
 		trackedState.enableInterruptions = false;
 	}
@@ -109,15 +109,14 @@ export function parseArgs() {
 			trackedState.model = 'gpt-5.2';
 		} else if (process.env.OLLAMA_BASE_URL) {
 			trackedState.model = 'ollama-qwen3-coder:30b';
-		}
-		if (!trackedState.model) {
+		} else {
 			trackedState.model = 'gpt-5.2';
 		}
 	}
 
 	// If no compaction model was provided, align it with the chosen provider to avoid extra API key prompts
 	if (!trackedState.compactionModel) {
-		const m = trackedState.model || '';
+		const m = trackedState.model;
 		if (m.startsWith('claude-')) {
 			trackedState.compactionModel = 'claude-3-5-haiku-latest';
 		} else if (m.startsWith('gemini-')) {
@@ -128,11 +127,8 @@ export function parseArgs() {
 			trackedState.compactionModel = 'gpt-4o-mini';
 		}
 	}
-	if (isOpenAIModel(trackedState.model)) {
-		if (!trackedState.compactionModel) {
-			trackedState.compactionModel = 'gpt-4o-mini';
-		}
-	} else {
+
+	if (!isOpenAIModel(trackedState.model)) {
 		process.env.OPENAI_AGENTS_DISABLE_TRACING = process.env.OPENAI_AGENTS_DISABLE_TRACING || '1';
 	}
 }
