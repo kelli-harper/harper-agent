@@ -1,6 +1,7 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
 import { updateEnv } from '../../utils/files/updateEnv';
+import { getEnv } from '../../utils/getEnv';
 
 const SetInterpreterAutoApproveParameters = z.object({
 	autoApprove: z.boolean(),
@@ -9,21 +10,21 @@ const SetInterpreterAutoApproveParameters = z.object({
 export const setInterpreterAutoApproveTool = tool({
 	name: 'setInterpreterAutoApproveTool',
 	description:
-		'Enable or disable automatic approval for code interpreter by setting CODE_INTERPRETER_AUTO_APPROVE=1 or 0 in .env and current process.',
+		'Enable or disable automatic approval for code interpreter by setting HAIRPER_AUTO_APPROVE_CODE_INTERPRETER=1 or 0 in .env and current process.',
 	parameters: SetInterpreterAutoApproveParameters,
 	needsApproval: async (_runContext, { autoApprove }) => {
 		const newValue = autoApprove ? '1' : '0';
-		return process.env.CODE_INTERPRETER_AUTO_APPROVE !== newValue;
+		return getEnv('HAIRPER_AUTO_APPROVE_CODE_INTERPRETER', 'CODE_INTERPRETER_AUTO_APPROVE') !== newValue;
 	},
 	async execute({ autoApprove }: z.infer<typeof SetInterpreterAutoApproveParameters>) {
 		const newValue = autoApprove ? '1' : '0';
-		if (process.env.CODE_INTERPRETER_AUTO_APPROVE === newValue) {
-			return `CODE_INTERPRETER_AUTO_APPROVE is already set to ${newValue} in the current process.`;
+		if (getEnv('HAIRPER_AUTO_APPROVE_CODE_INTERPRETER', 'CODE_INTERPRETER_AUTO_APPROVE') === newValue) {
+			return `HAIRPER_AUTO_APPROVE_CODE_INTERPRETER is already set to ${newValue}.`;
 		}
 
 		try {
-			await updateEnv('CODE_INTERPRETER_AUTO_APPROVE', newValue);
-			return `CODE_INTERPRETER_AUTO_APPROVE has been set to ${newValue} in .env and current process.`;
+			await updateEnv('HAIRPER_AUTO_APPROVE_CODE_INTERPRETER', newValue);
+			return `HAIRPER_AUTO_APPROVE_CODE_INTERPRETER has been set to ${newValue} in .env and current process.`;
 		} catch (error: any) {
 			return `Error updating .env file: ${error.message}`;
 		}

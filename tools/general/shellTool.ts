@@ -2,6 +2,7 @@ import { tool } from '@openai/agents';
 import chalk from 'chalk';
 import { z } from 'zod';
 import { mentionsIgnoredPath } from '../../utils/files/mentionsIgnoredPath';
+import { getEnv } from '../../utils/getEnv';
 import { isRiskyCommand } from '../../utils/shell/isRiskyCommand';
 import { LocalShell } from '../../utils/shell/LocalShell';
 import { spinner } from '../../utils/shell/spinner';
@@ -36,7 +37,8 @@ export const shellTool = tool({
 		const foundRiskyCommand = commands.find((command) => isRiskyCommand(command));
 		const foundIgnoredInteraction = commands.find((command) => mentionsIgnoredPath(command));
 
-		const autoApproved = process.env.SHELL_AUTO_APPROVE === '1' && !foundRiskyCommand && !foundIgnoredInteraction;
+		const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_SHELL', 'SHELL_AUTO_APPROVE') === '1' && !foundRiskyCommand
+			&& !foundIgnoredInteraction;
 
 		spinner.stop();
 		if (autoApproved) {

@@ -66,9 +66,9 @@ export class Chat {
 				...process.env,
 				HAIRPER_SKIP_UPDATE: 'true',
 				// _HARPER_TEST_CLI: 'true',
-				APPLY_PATCH_AUTO_APPROVE: '1',
-				CODE_INTERPRETER_AUTO_APPROVE: '1',
-				SHELL_AUTO_APPROVE: '1',
+				HAIRPER_AUTO_APPROVE_PATCHES: '1',
+				HAIRPER_AUTO_APPROVE_CODE_INTERPRETER: '1',
+				HAIRPER_AUTO_APPROVE_SHELL: '1',
 				// Disable stdin-based interruption logic during E2E runs to avoid races
 				HAIRPER_DISABLE_INTERRUPTIONS: '1',
 				OPENAI_AGENTS_DISABLE_TRACING: process.env.OPENAI_AGENTS_DISABLE_TRACING || '1',

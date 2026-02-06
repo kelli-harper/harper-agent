@@ -6,6 +6,7 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 import { z } from 'zod';
 import { trackedState } from '../../lifecycle/trackedState';
+import { getEnv } from '../../utils/getEnv';
 import { spinner } from '../../utils/shell/spinner';
 
 const execAsync = promisify(exec);
@@ -35,7 +36,7 @@ export async function needsApproval(
 		return false;
 	}
 
-	const autoApproved = process.env.CODE_INTERPRETER_AUTO_APPROVE === '1';
+	const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_CODE_INTERPRETER', 'CODE_INTERPRETER_AUTO_APPROVE') === '1';
 
 	spinner.stop();
 	if (autoApproved) {

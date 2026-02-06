@@ -1,6 +1,7 @@
 import { tool } from '@openai/agents';
 import { z } from 'zod';
 import { updateEnv } from '../../utils/files/updateEnv';
+import { getEnv } from '../../utils/getEnv';
 
 const SetPatchAutoApproveParameters = z.object({
 	autoApprove: z.boolean(),
@@ -9,21 +10,21 @@ const SetPatchAutoApproveParameters = z.object({
 export const setPatchAutoApproveTool = tool({
 	name: 'setPatchAutoApproveTool',
 	description:
-		'Enable or disable automatic approval for patch commands by setting APPLY_PATCH_AUTO_APPROVE=1 or 0 in .env and current process.',
+		'Enable or disable automatic approval for patch commands by setting HAIRPER_AUTO_APPROVE_PATCHES=1 or 0 in .env and current process.',
 	parameters: SetPatchAutoApproveParameters,
 	needsApproval: async (_runContext, { autoApprove }) => {
 		const newValue = autoApprove ? '1' : '0';
-		return process.env.APPLY_PATCH_AUTO_APPROVE !== newValue;
+		return getEnv('HAIRPER_AUTO_APPROVE_PATCHES', 'APPLY_PATCH_AUTO_APPROVE') !== newValue;
 	},
 	async execute({ autoApprove }: z.infer<typeof SetPatchAutoApproveParameters>) {
 		const newValue = autoApprove ? '1' : '0';
-		if (process.env.APPLY_PATCH_AUTO_APPROVE === newValue) {
-			return `APPLY_PATCH_AUTO_APPROVE is already set to ${newValue} in the current process.`;
+		if (getEnv('HAIRPER_AUTO_APPROVE_PATCHES', 'APPLY_PATCH_AUTO_APPROVE') === newValue) {
+			return `HAIRPER_AUTO_APPROVE_PATCHES is already set to ${newValue}.`;
 		}
 
 		try {
-			await updateEnv('APPLY_PATCH_AUTO_APPROVE', newValue);
-			return `APPLY_PATCH_AUTO_APPROVE has been set to ${newValue} in .env and current process.`;
+			await updateEnv('HAIRPER_AUTO_APPROVE_PATCHES', newValue);
+			return `HAIRPER_AUTO_APPROVE_PATCHES has been set to ${newValue} in .env and current process.`;
 		} catch (error: any) {
 			return `Error updating .env file: ${error.message}`;
 		}

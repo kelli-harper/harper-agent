@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import { z } from 'zod';
 import { trackedState } from '../../lifecycle/trackedState';
 import { printDiff } from '../../utils/files/printDiff';
+import { getEnv } from '../../utils/getEnv';
 import { spinner } from '../../utils/shell/spinner';
 import { WorkspaceEditor } from './workspaceEditor';
 
@@ -27,7 +28,7 @@ export function createApplyPatchTool() {
 					return false;
 				}
 
-				const autoApproved = process.env.APPLY_PATCH_AUTO_APPROVE === '1';
+				const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_PATCHES', 'APPLY_PATCH_AUTO_APPROVE') === '1';
 
 				spinner.stop();
 				if (autoApproved) {

@@ -1,8 +1,8 @@
 import type { Shell, ShellAction, ShellOutputResult, ShellResult } from '@openai/agents';
 import { exec } from 'node:child_process';
-import process from 'node:process';
 import { promisify } from 'node:util';
 import { trackedState } from '../../lifecycle/trackedState';
+import { getEnv } from '../getEnv';
 
 const execAsync = promisify(exec);
 
@@ -10,7 +10,7 @@ export class LocalShell implements Shell {
 	private readonly defaultTimeoutMs: number;
 
 	constructor(options?: { defaultTimeoutMs?: number }) {
-		const envValRaw = process.env.SHELL_DEFAULT_TIMEOUT_MS;
+		const envValRaw = getEnv('HAIRPER_SHELL_TIMEOUT_MS', 'SHELL_DEFAULT_TIMEOUT_MS');
 		const envVal = envValRaw !== undefined ? Number(envValRaw) : undefined;
 		this.defaultTimeoutMs = options?.defaultTimeoutMs ?? (
 			envVal !== undefined && !Number.isNaN(envVal) ? envVal : 20_000
