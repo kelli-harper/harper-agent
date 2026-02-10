@@ -7,7 +7,7 @@ import { spinner } from '../utils/shell/spinner';
 export async function cleanUpAndSayBye() {
 	spinner.stop();
 	costTracker.logFinalStats();
-	if (harperProcess.startedByHairper) {
+	if (harperProcess.startedInternally) {
 		harperProcess.stop();
 	}
 	console.log('');

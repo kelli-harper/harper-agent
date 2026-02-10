@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module
-        fileurl="file://$PROJECT_DIR$/.idea/hairper.iml"
-        filepath="$PROJECT_DIR$/.idea/hairper.iml"
+        fileurl="file://$PROJECT_DIR$/.idea/harper-agent.iml"
+        filepath="$PROJECT_DIR$/.idea/harper-agent.iml"
       />
     </modules>
   </component>

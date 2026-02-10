@@ -9,6 +9,6 @@ export function getOwnPackageJson() {
 		const packageContents = readFileSync(join(__dirname, '../package.json'), 'utf8');
 		return JSON.parse(packageContents);
 	} catch {
-		return { name: 'hairper', version: '0.0.0' };
+		return { name: '@harperfast/agent', version: '0.0.0' };
 	}
 }

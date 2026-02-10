@@ -19,7 +19,7 @@ class HarperProcess {
 		return this.externalPid !== null;
 	}
 
-	get startedByHairper(): boolean {
+	get startedInternally(): boolean {
 		return this.childProcess !== null;
 	}
 

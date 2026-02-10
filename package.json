@@ -1,11 +1,11 @@
 {
-	"name": "hairper",
+	"name": "@harperfast/agent",
 	"description": "AI to help you with Harper app management",
 	"version": "0.10.6",
 	"main": "dist/agent.js",
-	"repository": "github:HarperFast/hairper",
+	"repository": "github:HarperFast/harper-agent",
 	"bugs": {
-		"url": "https://github.com/harperfast/hairper/issues"
+		"url": "https://github.com/harperfast/harper-agent/issues"
 	},
 	"homepage": "https://github.com/harperfast",
 	"scripts": {
@@ -26,7 +26,7 @@
 		"prepublishOnly": "npm run build"
 	},
 	"bin": {
-		"hairper": "./dist/agent.js"
+		"harper-agent": "./dist/agent.js"
 	},
 	"keywords": [],
 	"author": {

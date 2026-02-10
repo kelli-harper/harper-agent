@@ -69,32 +69,32 @@ export function parseArgs() {
 	}
 
 	// Explicit env overrides for direct model configuration
-	if (!trackedState.model && process.env.HAIRPER_MODEL) {
-		trackedState.model = process.env.HAIRPER_MODEL;
+	if (!trackedState.model && process.env.HARPER_AGENT_MODEL) {
+		trackedState.model = process.env.HARPER_AGENT_MODEL;
 	}
-	if (!trackedState.compactionModel && process.env.HAIRPER_COMPACTION_MODEL) {
-		trackedState.compactionModel = process.env.HAIRPER_COMPACTION_MODEL;
+	if (!trackedState.compactionModel && process.env.HARPER_AGENT_COMPACTION_MODEL) {
+		trackedState.compactionModel = process.env.HARPER_AGENT_COMPACTION_MODEL;
 	}
-	if (!trackedState.sessionPath && process.env.HAIRPER_SESSION) {
-		trackedState.sessionPath = process.env.HAIRPER_SESSION;
+	if (!trackedState.sessionPath && process.env.HARPER_AGENT_SESSION) {
+		trackedState.sessionPath = process.env.HARPER_AGENT_SESSION;
 	}
 
-	if (!trackedState.useFlexTier && isTrue(process.env.HAIRPER_FLEX_TIER)) {
+	if (!trackedState.useFlexTier && isTrue(process.env.HARPER_AGENT_FLEX_TIER)) {
 		trackedState.useFlexTier = true;
 	}
 
 	// Spinner control via env
 	if (
 		!trackedState.disableSpinner
-		&& (isTrue(process.env.HAIRPER_NO_SPINNER) || isTrue(process.env.HAIRPER_DISABLE_SPINNER))
+		&& (isTrue(process.env.HARPER_AGENT_NO_SPINNER) || isTrue(process.env.HARPER_AGENT_DISABLE_SPINNER))
 	) {
 		trackedState.disableSpinner = true;
 	}
 
 	// Interruption control via env (default is enabled)
 	if (
-		isTrue(process.env.HAIRPER_DISABLE_INTERRUPTION) || isTrue(process.env.HAIRPER_DISABLE_INTERRUPTIONS)
-		|| isFalse(process.env.HAIRPER_ENABLE_INTERRUPTION) || isFalse(process.env.HAIRPER_ENABLE_INTERRUPTIONS)
+		isTrue(process.env.HARPER_AGENT_DISABLE_INTERRUPTION) || isTrue(process.env.HARPER_AGENT_DISABLE_INTERRUPTIONS)
+		|| isFalse(process.env.HARPER_AGENT_ENABLE_INTERRUPTION) || isFalse(process.env.HARPER_AGENT_ENABLE_INTERRUPTIONS)
 	) {
 		trackedState.enableInterruptions = false;
 	}

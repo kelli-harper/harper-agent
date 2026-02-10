@@ -28,7 +28,7 @@ export function createApplyPatchTool() {
 					return false;
 				}
 
-				const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_PATCHES', 'APPLY_PATCH_AUTO_APPROVE') === '1';
+				const autoApproved = getEnv('HARPER_AGENT_AUTO_APPROVE_PATCHES', 'APPLY_PATCH_AUTO_APPROVE') === '1';
 
 				spinner.stop();
 				if (autoApproved) {

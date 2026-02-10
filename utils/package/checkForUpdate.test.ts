@@ -29,9 +29,9 @@ describe('checkForUpdate', () => {
 		process.argv = originalArgv;
 	});
 
-	it('should return version if HAIRPER_SKIP_UPDATE is set', async () => {
-		process.env.HAIRPER_SKIP_UPDATE = '1';
-		vi.mocked(getOwnPackageJson).mockReturnValue({ name: 'hairper', version: '1.0.0' });
+	it('should return version if HARPER_AGENT_SKIP_UPDATE is set', async () => {
+		process.env.HARPER_AGENT_SKIP_UPDATE = '1';
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 
 		const version = await checkForUpdate();
 		expect(version).toBe('1.0.0');
@@ -39,7 +39,7 @@ describe('checkForUpdate', () => {
 	});
 
 	it('should return version if no new version is available', async () => {
-		vi.mocked(getOwnPackageJson).mockReturnValue({ name: 'hairper', version: '1.0.0' });
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 		vi.mocked(getLatestVersion).mockResolvedValue('1.0.0');
 		vi.mocked(isVersionNewer).mockReturnValue(false);
 
@@ -49,31 +49,33 @@ describe('checkForUpdate', () => {
 	});
 
 	it('should attempt to update if a newer version is available', async () => {
-		vi.mocked(getOwnPackageJson).mockReturnValue({ name: 'hairper', version: '1.0.0' });
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 		vi.mocked(getLatestVersion).mockResolvedValue('1.1.0');
 		vi.mocked(isVersionNewer).mockReturnValue(true);
 		vi.mocked(spawn.sync).mockReturnValue({ stdout: '', status: 0 } as any);
 
 		await checkForUpdate();
 
-		expect(console.log).toHaveBeenCalledWith(expect.stringContaining('A new version of hairper is available'));
+		expect(console.log).toHaveBeenCalledWith(
+			expect.stringContaining('A new version of @harperfast/agent is available'),
+		);
 		expect(spawn.sync).toHaveBeenCalledWith(
 			'npx',
-			expect.arrayContaining(['-y', 'hairper@latest']),
+			expect.arrayContaining(['-y', '@harperfast/agent@latest']),
 			expect.any(Object),
 		);
 		expect(process.exit).toHaveBeenCalledWith(0);
 	});
 
 	it('should clear npx cache if existing entries are found', async () => {
-		vi.mocked(getOwnPackageJson).mockReturnValue({ name: 'hairper', version: '1.0.0' });
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 		vi.mocked(getLatestVersion).mockResolvedValue('1.1.0');
 		vi.mocked(isVersionNewer).mockReturnValue(true);
 
 		// Mock npm cache npx ls
 		vi.mocked(spawn.sync).mockImplementation((cmd, args) => {
 			if (cmd === 'npm' && args && args[2] === 'ls') {
-				return { stdout: 'key1: hairper@1.0.0\nkey2: otherpkg@1.0.0', status: 0 } as any;
+				return { stdout: 'key1: @harperfast/agent@1.0.0\nkey2: otherpkg@1.0.0', status: 0 } as any;
 			}
 			return { stdout: '', status: 0 } as any;
 		});
@@ -85,7 +87,7 @@ describe('checkForUpdate', () => {
 	});
 
 	it('should continue if update check fails', async () => {
-		vi.mocked(getOwnPackageJson).mockReturnValue({ name: 'hairper', version: '1.0.0' });
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 		vi.mocked(getLatestVersion).mockRejectedValue(new Error('Network error'));
 
 		const version = await checkForUpdate();

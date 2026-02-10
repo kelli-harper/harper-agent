@@ -42,8 +42,8 @@ describe('codeInterpreterTool', () => {
 	});
 
 	describe('needsApproval', () => {
-		it('should return true if HAIRPER_AUTO_APPROVE_CODE_INTERPRETER is not set', async () => {
-			delete process.env.HAIRPER_AUTO_APPROVE_CODE_INTERPRETER;
+		it('should return true if HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER is not set', async () => {
+			delete process.env.HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER;
 			delete process.env.CODE_INTERPRETER_AUTO_APPROVE;
 			const result = await needsApproval({ isToolApproved: () => false } as any, {
 				code: 'print("test")',
@@ -54,8 +54,8 @@ describe('codeInterpreterTool', () => {
 			expect(spinner.start).not.toHaveBeenCalled();
 		});
 
-		it('should return false if HAIRPER_AUTO_APPROVE_CODE_INTERPRETER is set to 1', async () => {
-			process.env.HAIRPER_AUTO_APPROVE_CODE_INTERPRETER = '1';
+		it('should return false if HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER is set to 1', async () => {
+			process.env.HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER = '1';
 			const result = await needsApproval({ isToolApproved: () => false } as any, {
 				code: 'print("test")',
 				language: 'python',
@@ -66,7 +66,7 @@ describe('codeInterpreterTool', () => {
 		});
 
 		it('should return false and log deprecation if CODE_INTERPRETER_AUTO_APPROVE is set to 1', async () => {
-			delete process.env.HAIRPER_AUTO_APPROVE_CODE_INTERPRETER;
+			delete process.env.HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER;
 			process.env.CODE_INTERPRETER_AUTO_APPROVE = '1';
 			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

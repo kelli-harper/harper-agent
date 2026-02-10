@@ -20,19 +20,19 @@ function resetState() {
 
 function clearAllEnv() {
 	clearProviderEnv();
-	delete process.env.HAIRPER_NO_SPINNER;
-	delete process.env.HAIRPER_DISABLE_SPINNER;
-	delete process.env.HAIRPER_DISABLE_INTERRUPTION;
-	delete process.env.HAIRPER_DISABLE_INTERRUPTIONS;
-	delete process.env.HAIRPER_ENABLE_INTERRUPTION;
-	delete process.env.HAIRPER_ENABLE_INTERRUPTIONS;
+	delete process.env.HARPER_AGENT_NO_SPINNER;
+	delete process.env.HARPER_AGENT_DISABLE_SPINNER;
+	delete process.env.HARPER_AGENT_DISABLE_INTERRUPTION;
+	delete process.env.HARPER_AGENT_DISABLE_INTERRUPTIONS;
+	delete process.env.HARPER_AGENT_ENABLE_INTERRUPTION;
+	delete process.env.HARPER_AGENT_ENABLE_INTERRUPTIONS;
 }
 
 function clearProviderEnv() {
-	delete process.env.HAIRPER_MODEL;
-	delete process.env.HAIRPER_COMPACTION_MODEL;
-	delete process.env.HAIRPER_SESSION;
-	delete process.env.HAIRPER_FLEX_TIER;
+	delete process.env.HARPER_AGENT_MODEL;
+	delete process.env.HARPER_AGENT_COMPACTION_MODEL;
+	delete process.env.HARPER_AGENT_SESSION;
+	delete process.env.HARPER_AGENT_FLEX_TIER;
 
 	delete process.env.OPENAI_API_KEY;
 	delete process.env.ANTHROPIC_API_KEY;
@@ -83,9 +83,9 @@ describe('parseArgs defaults based on ENV provider keys', () => {
 		expect(trackedState.compactionModel).toBe('ollama-qwen2.5-coder');
 	});
 
-	it('HAIRPER_MODEL explicit env should override provider defaults', () => {
+	it('HARPER_AGENT_MODEL explicit env should override provider defaults', () => {
 		process.env.ANTHROPIC_API_KEY = 'sk-ant-123';
-		process.env.HAIRPER_MODEL = 'gpt-4o';
+		process.env.HARPER_AGENT_MODEL = 'gpt-4o';
 		parseArgs();
 		expect(trackedState.model).toBe('gpt-4o');
 	});
@@ -212,56 +212,56 @@ describe('parseArgs Environment Variables', () => {
 		resetState();
 	});
 
-	it('uses HAIRPER_SESSION', () => {
-		process.env.HAIRPER_SESSION = './env-session.json';
+	it('uses HARPER_AGENT_SESSION', () => {
+		process.env.HARPER_AGENT_SESSION = './env-session.json';
 		parseArgs();
 		expect(trackedState.sessionPath).toBe('./env-session.json');
 	});
 
-	it('uses HAIRPER_FLEX_TIER=true', () => {
-		process.env.HAIRPER_FLEX_TIER = 'true';
+	it('uses HARPER_AGENT_FLEX_TIER=true', () => {
+		process.env.HARPER_AGENT_FLEX_TIER = 'true';
 		parseArgs();
 		expect(trackedState.useFlexTier).toBe(true);
 	});
 
-	it('uses HAIRPER_FLEX_TIER=1', () => {
-		process.env.HAIRPER_FLEX_TIER = '1';
+	it('uses HARPER_AGENT_FLEX_TIER=1', () => {
+		process.env.HARPER_AGENT_FLEX_TIER = '1';
 		parseArgs();
 		expect(trackedState.useFlexTier).toBe(true);
 	});
 
-	it('uses HAIRPER_NO_SPINNER=true', () => {
-		process.env.HAIRPER_NO_SPINNER = 'true';
+	it('uses HARPER_AGENT_NO_SPINNER=true', () => {
+		process.env.HARPER_AGENT_NO_SPINNER = 'true';
 		parseArgs();
 		expect(trackedState.disableSpinner).toBe(true);
 	});
 
-	it('uses HAIRPER_DISABLE_INTERRUPTION=true', () => {
-		process.env.HAIRPER_DISABLE_INTERRUPTION = 'true';
+	it('uses HARPER_AGENT_DISABLE_INTERRUPTION=true', () => {
+		process.env.HARPER_AGENT_DISABLE_INTERRUPTION = 'true';
 		parseArgs();
 		expect(trackedState.enableInterruptions).toBe(false);
 	});
 
-	it('uses HAIRPER_ENABLE_INTERRUPTIONS=false', () => {
-		process.env.HAIRPER_ENABLE_INTERRUPTIONS = 'false';
+	it('uses HARPER_AGENT_ENABLE_INTERRUPTIONS=false', () => {
+		process.env.HARPER_AGENT_ENABLE_INTERRUPTIONS = 'false';
 		parseArgs();
 		expect(trackedState.enableInterruptions).toBe(false);
 	});
 
-	it('uses HAIRPER_ENABLE_INTERRUPTIONS=0', () => {
-		process.env.HAIRPER_ENABLE_INTERRUPTIONS = '0';
+	it('uses HARPER_AGENT_ENABLE_INTERRUPTIONS=0', () => {
+		process.env.HARPER_AGENT_ENABLE_INTERRUPTIONS = '0';
 		parseArgs();
 		expect(trackedState.enableInterruptions).toBe(false);
 	});
 
-	it('uses HAIRPER_DISABLE_INTERRUPTIONS=1', () => {
-		process.env.HAIRPER_DISABLE_INTERRUPTIONS = '1';
+	it('uses HARPER_AGENT_DISABLE_INTERRUPTIONS=1', () => {
+		process.env.HARPER_AGENT_DISABLE_INTERRUPTIONS = '1';
 		parseArgs();
 		expect(trackedState.enableInterruptions).toBe(false);
 	});
 
 	it('CLI arg takes precedence over Env var', () => {
-		process.env.HAIRPER_MODEL = 'gpt-env';
+		process.env.HARPER_AGENT_MODEL = 'gpt-env';
 		process.argv.push('--model', 'gpt-cli');
 		parseArgs();
 		expect(trackedState.model).toBe('gpt-cli');

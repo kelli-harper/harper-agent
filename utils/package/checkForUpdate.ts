@@ -5,7 +5,7 @@ import { getOwnPackageJson } from './getOwnPackageJson';
 import { isVersionNewer } from './isVersionNewer';
 
 /**
- * Checks if a newer version of hairper is available on npm.
+ * Checks if a newer version of harper-agent is available on npm.
  * If a newer version exists, it attempts to re-run the process using npx with the latest version.
  */
 export async function checkForUpdate(): Promise<string> {
@@ -13,7 +13,7 @@ export async function checkForUpdate(): Promise<string> {
 	const packageName = pkg.name;
 	const packageVersion = pkg.version;
 
-	if (process.env.HAIRPER_SKIP_UPDATE) {
+	if (process.env.HARPER_AGENT_SKIP_UPDATE) {
 		return packageVersion;
 	}
 

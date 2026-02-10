@@ -1,4 +1,4 @@
-# Contributing to Hairper
+# Contributing to Harper Agent
 
 Thank you for your interest in contributing! This document explains how to set up your environment, make changes safely, and submit high‑quality pull requests.
 
@@ -17,7 +17,7 @@ npm install
 ## Development workflow
 
 - Link the package: `npm link`
-- Run it: `hairper`
+- Run it: `harper-agent`
 - Lint: `npm run lint:fix`
 - Format: `npm run format:fix`
 
@@ -52,15 +52,15 @@ Where practical, add or update unit tests for your changes.
 
 ### Disable the Spinner (useful for CI/E2E)
 
-By default, Hairper shows a live spinner while thinking. For cleaner logs in CI or end-to-end tests, you can disable it:
+By default, Harper Agent shows a live spinner while thinking. For cleaner logs in CI or end-to-end tests, you can disable it:
 
 ```bash
 # CLI flag
-hairper --no-spinner
+harper-agent --no-spinner
 
 # or set an environment variable
-export HAIRPER_NO_SPINNER=true
-# (alternatively) export HAIRPER_DISABLE_SPINNER=1
+export HARPER_AGENT_NO_SPINNER=true
+# (alternatively) export HARPER_AGENT_DISABLE_SPINNER=1
 ```
 
 Disabling the spinner preserves the ability to interrupt a step by pressing Enter; it simply stops the animated output.

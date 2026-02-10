@@ -26,13 +26,13 @@ describe('getOwnPackageJson', () => {
 		});
 
 		const pkg = getOwnPackageJson();
-		expect(pkg).toEqual({ name: 'hairper', version: '0.0.0' });
+		expect(pkg).toEqual({ name: '@harperfast/agent', version: '0.0.0' });
 	});
 
 	it('should return default values if JSON parsing fails', () => {
 		vi.mocked(readFileSync).mockReturnValue('invalid json');
 
 		const pkg = getOwnPackageJson();
-		expect(pkg).toEqual({ name: 'hairper', version: '0.0.0' });
+		expect(pkg).toEqual({ name: '@harperfast/agent', version: '0.0.0' });
 	});
 });

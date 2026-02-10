@@ -11,9 +11,9 @@ import { Chat } from './utils/chat';
 describe('App Creation Tests', () => {
 	const chat = new Chat();
 	const youArePretendingToBeADev =
-		'You are pretending to be a human chatting with the Hairper coding agent to create your next great app. ';
-	const instructHairper =
-		'Form your messages as short, simple instructions of what you want Hairper to do for you. It will do the coding work. ';
+		'You are pretending to be a human chatting with the harper-agent coding agent to create your next great app. ';
+	const instructAgent =
+		'Form your messages as short, simple instructions of what you want harper-agent to do for you. It will do the coding work. ';
 
 	beforeAll(() => parseArgs());
 
@@ -43,7 +43,7 @@ describe('App Creation Tests', () => {
 		'can guide the user through simple questions',
 		async () => {
 			const messages = chat.bootstrap();
-			const instructions = youArePretendingToBeADev + instructHairper
+			const instructions = youArePretendingToBeADev + instructAgent
 				+ 'You want to create a React TypeScript app that flips coins as a game.';
 
 			const human = new Agent({
@@ -72,12 +72,12 @@ describe('App Creation Tests', () => {
 					chat.stop();
 					break;
 				}
-				console.log('Hairper: Thinking...');
+				console.log('Harper: Thinking...');
 			}
 
 			const response = await run(
 				human,
-				'Do you think Hairper was successful in accomplishing your goal? Either respond with the string "yes" (without quotes around it) and nothing else, or a detailed error description.',
+				'Do you think Harper was successful in accomplishing your goal? Either respond with the string "yes" (without quotes around it) and nothing else, or a detailed error description.',
 				{ session },
 			);
 			expect(response.finalOutput).toBe('yes');

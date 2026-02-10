@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 1000 200"
-  width="480"
+  viewBox="0 0 1280 200"
+  width="640"
   height="200"
   role="img"
-  aria-label="hairper, npx -y hairper"
+  aria-label="npx -y harper-agent"
 >
   <defs>
     <!-- Brand-ish gradient for the wordmark -->
@@ -37,7 +37,7 @@
       font-weight="800"
       letter-spacing="-1.5"
       fill="url(#harperGrad)"
-    >h{ai}rper</text>
+    >harper agent</text>
 
     <!-- little “terminal” capsule -->
     <g transform="translate(0 120)">
@@ -62,10 +62,10 @@
         font-size="22"
         fill="#e6f7ff"
         opacity="0.96"
-      >$ npx -y hairper</text>
+      >$ npx -y harper-agent</text>
 
       <!-- blinking cursor -->
-      <rect x="310" y="17" width="3" height="24" fill="#e6f7ff" opacity="0.55">
+      <rect x="380" y="17" width="12" height="24" fill="#e6f7ff" opacity="0.55">
         <animate
           attributeName="opacity"
           values="0.1;0.8;0.1"

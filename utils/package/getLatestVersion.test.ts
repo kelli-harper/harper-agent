@@ -13,10 +13,10 @@ describe('getLatestVersion', () => {
 		});
 		vi.stubGlobal('fetch', mockFetch);
 
-		const version = await getLatestVersion('hairper');
+		const version = await getLatestVersion('@harperfast/agent');
 		expect(version).toBe('1.2.3');
 		expect(mockFetch).toHaveBeenCalledWith(
-			'https://registry.npmjs.org/hairper/latest',
+			'https://registry.npmjs.org/@harperfast/agent/latest',
 			expect.any(Object),
 		);
 	});
@@ -27,7 +27,7 @@ describe('getLatestVersion', () => {
 		});
 		vi.stubGlobal('fetch', mockFetch);
 
-		const version = await getLatestVersion('hairper');
+		const version = await getLatestVersion('@harperfast/agent');
 		expect(version).toBeNull();
 	});
 
@@ -35,7 +35,7 @@ describe('getLatestVersion', () => {
 		const mockFetch = vi.fn().mockRejectedValue(new Error('Network error'));
 		vi.stubGlobal('fetch', mockFetch);
 
-		const version = await getLatestVersion('hairper');
+		const version = await getLatestVersion('@harperfast/agent');
 		expect(version).toBeNull();
 	});
 });

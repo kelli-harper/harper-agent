@@ -37,7 +37,7 @@ export const shellTool = tool({
 		const foundRiskyCommand = commands.find((command) => isRiskyCommand(command));
 		const foundIgnoredInteraction = commands.find((command) => mentionsIgnoredPath(command));
 
-		const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_SHELL', 'SHELL_AUTO_APPROVE') === '1' && !foundRiskyCommand
+		const autoApproved = getEnv('HARPER_AGENT_AUTO_APPROVE_SHELL', 'SHELL_AUTO_APPROVE') === '1' && !foundRiskyCommand
 			&& !foundIgnoredInteraction;
 
 		spinner.stop();

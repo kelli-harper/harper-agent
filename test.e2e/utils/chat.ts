@@ -18,7 +18,7 @@ export class Chat {
 	constructor() {
 		beforeEach(async () => {
 			// Create a fresh temporary working directory and switch into it
-			this.tempDir = mkdtempSync(join(os.tmpdir(), 'hairper-e2e-'));
+			this.tempDir = mkdtempSync(join(os.tmpdir(), 'harper-agent-e2e-'));
 			process.chdir(this.tempDir);
 		}, 60_000);
 
@@ -58,19 +58,19 @@ export class Chat {
 		this.child = spawn(process.execPath, [
 			cliPath,
 			'--model',
-			process.env.HAIRPER_MODEL || 'gpt-4o-mini',
+			process.env.HARPER_AGENT_MODEL || 'gpt-4o-mini',
 			'--no-spinner',
 		], {
 			cwd: this.tempDir,
 			env: {
 				...process.env,
-				HAIRPER_SKIP_UPDATE: 'true',
+				HARPER_AGENT_SKIP_UPDATE: 'true',
 				// _HARPER_TEST_CLI: 'true',
-				HAIRPER_AUTO_APPROVE_PATCHES: '1',
-				HAIRPER_AUTO_APPROVE_CODE_INTERPRETER: '1',
-				HAIRPER_AUTO_APPROVE_SHELL: '1',
+				HARPER_AGENT_AUTO_APPROVE_PATCHES: '1',
+				HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER: '1',
+				HARPER_AGENT_AUTO_APPROVE_SHELL: '1',
 				// Disable stdin-based interruption logic during E2E runs to avoid races
-				HAIRPER_DISABLE_INTERRUPTIONS: '1',
+				HARPER_AGENT_DISABLE_INTERRUPTIONS: '1',
 				OPENAI_AGENTS_DISABLE_TRACING: process.env.OPENAI_AGENTS_DISABLE_TRACING || '1',
 				OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
 			},
@@ -163,7 +163,7 @@ export class Chat {
 					: await new Promise<string>(res => {
 						resolveNext = res;
 					});
-				console.log(`Hairper: ${nextChunk}`);
+				console.log(`Harper: ${nextChunk}`);
 				yield nextChunk;
 			}
 		} finally {

@@ -10,7 +10,7 @@ export class LocalShell implements Shell {
 	private readonly defaultTimeoutMs: number;
 
 	constructor(options?: { defaultTimeoutMs?: number }) {
-		const envValRaw = getEnv('HAIRPER_SHELL_TIMEOUT_MS', 'SHELL_DEFAULT_TIMEOUT_MS');
+		const envValRaw = getEnv('HARPER_AGENT_SHELL_TIMEOUT_MS', 'SHELL_DEFAULT_TIMEOUT_MS');
 		const envVal = envValRaw !== undefined ? Number(envValRaw) : undefined;
 		this.defaultTimeoutMs = options?.defaultTimeoutMs ?? (
 			envVal !== undefined && !Number.isNaN(envVal) ? envVal : 20_000

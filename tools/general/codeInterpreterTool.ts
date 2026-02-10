@@ -36,7 +36,7 @@ export async function needsApproval(
 		return false;
 	}
 
-	const autoApproved = getEnv('HAIRPER_AUTO_APPROVE_CODE_INTERPRETER', 'CODE_INTERPRETER_AUTO_APPROVE') === '1';
+	const autoApproved = getEnv('HARPER_AGENT_AUTO_APPROVE_CODE_INTERPRETER', 'CODE_INTERPRETER_AUTO_APPROVE') === '1';
 
 	spinner.stop();
 	if (autoApproved) {

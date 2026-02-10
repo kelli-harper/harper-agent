@@ -3,12 +3,12 @@ import { LocalShell } from './LocalShell';
 
 describe('LocalShell', () => {
 	beforeEach(() => {
-		delete process.env.HAIRPER_SHELL_TIMEOUT_MS;
+		delete process.env.HARPER_AGENT_SHELL_TIMEOUT_MS;
 		delete process.env.SHELL_DEFAULT_TIMEOUT_MS;
 	});
 
-	it('uses HAIRPER_SHELL_TIMEOUT_MS from environment', async () => {
-		process.env.HAIRPER_SHELL_TIMEOUT_MS = '100';
+	it('uses HARPER_AGENT_SHELL_TIMEOUT_MS from environment', async () => {
+		process.env.HARPER_AGENT_SHELL_TIMEOUT_MS = '100';
 		const shell = new LocalShell();
 		const result = await shell.run({
 			commands: ['node -e "setTimeout(()=>{}, 500)"'],

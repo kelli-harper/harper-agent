@@ -20,10 +20,10 @@ class Spinner {
 
 	start() {
 		const disabled = trackedState.disableSpinner
-			|| process.env.HAIRPER_NO_SPINNER === 'true'
-			|| process.env.HAIRPER_NO_SPINNER === '1'
-			|| process.env.HAIRPER_DISABLE_SPINNER === 'true'
-			|| process.env.HAIRPER_DISABLE_SPINNER === '1';
+			|| process.env.HARPER_AGENT_NO_SPINNER === 'true'
+			|| process.env.HARPER_AGENT_NO_SPINNER === '1'
+			|| process.env.HARPER_AGENT_DISABLE_SPINNER === 'true'
+			|| process.env.HARPER_AGENT_DISABLE_SPINNER === '1';
 		if (this.interval) {
 			return;
 		}
