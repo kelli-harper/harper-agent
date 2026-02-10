@@ -52,7 +52,7 @@ describe('App Creation Tests', () => {
 				modelSettings,
 				instructions,
 			});
-			const session = createSession(trackedState.compactionModel, trackedState.sessionPath);
+			const session = createSession(trackedState.sessionPath);
 
 			let interactionsRemaining = 3;
 
