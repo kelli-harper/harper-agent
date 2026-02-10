@@ -86,6 +86,32 @@ describe('checkForUpdate', () => {
 		expect(process.exit).toHaveBeenCalled();
 	});
 
+	it('should attempt to update via npm -g if installed globally', async () => {
+		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
+		vi.mocked(getLatestVersion).mockResolvedValue('1.1.0');
+		vi.mocked(isVersionNewer).mockReturnValue(true);
+
+		const globalRoot = '/usr/local/lib/node_modules';
+		process.argv[1] = `${globalRoot}/@harperfast/agent/dist/agent.js`;
+
+		vi.mocked(spawn.sync).mockImplementation((cmd, args) => {
+			if (cmd === 'npm' && args && args[0] === 'root' && args[1] === '-g') {
+				return { stdout: globalRoot, status: 0 } as any;
+			}
+			return { stdout: '', status: 0 } as any;
+		});
+
+		await checkForUpdate();
+
+		expect(spawn.sync).toHaveBeenCalledWith(
+			'npm',
+			['install', '-g', '@harperfast/agent@latest'],
+			expect.any(Object),
+		);
+		expect(spawn.sync).toHaveBeenCalledWith('harper-agent', expect.any(Array), expect.any(Object));
+		expect(process.exit).toHaveBeenCalled();
+	});
+
 	it('should continue if update check fails', async () => {
 		vi.mocked(getOwnPackageJson).mockReturnValue({ name: '@harperfast/agent', version: '1.0.0' });
 		vi.mocked(getLatestVersion).mockRejectedValue(new Error('Network error'));

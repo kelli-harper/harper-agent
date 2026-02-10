@@ -30,6 +30,33 @@ export async function checkForUpdate(): Promise<string> {
 			);
 			console.log(`Automatically updating to the latest version...\n`);
 
+			// Check if we are running from a global installation
+			let isGlobal = false;
+			try {
+				const globalRootResult = spawn.sync('npm', ['root', '-g'], {
+					encoding: 'utf8',
+				});
+				const globalRoot = globalRootResult.stdout?.trim();
+
+				if (globalRoot && process.argv[1] && process.argv[1].startsWith(globalRoot)) {
+					isGlobal = true;
+				}
+			} catch {
+				// Fallback to npx if check fails
+			}
+
+			if (isGlobal) {
+				spawn.sync('npm', ['install', '-g', `${packageName}@latest`], {
+					stdio: 'inherit',
+				});
+
+				const result = spawn.sync('harper-agent', process.argv.slice(2), {
+					stdio: 'inherit',
+				});
+
+				process.exit(result.status ?? 0);
+			}
+
 			// Clear the npx cache for this package to ensure we get the latest version
 			const lsResult = spawn.sync('npm', ['cache', 'npx', 'ls', packageName], {
 				encoding: 'utf8',
