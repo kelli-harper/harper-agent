@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { handleHelp, handleVersion, isHelpRequest, isVersionRequest } from '../utils/shell/cli';
 import { isFalse } from '../utils/strings/isFalse';
 import { isTrue } from '../utils/strings/isTrue';
@@ -77,6 +78,14 @@ export function parseArgs() {
 	}
 	if (!trackedState.sessionPath && process.env.HARPER_AGENT_SESSION) {
 		trackedState.sessionPath = process.env.HARPER_AGENT_SESSION;
+	}
+
+	// Resolve immediately so the path remains stable if CWD changes later
+	const sp = trackedState.sessionPath;
+	if (sp) {
+		trackedState.sessionPath = sp && !sp.startsWith('~') && !path.isAbsolute(sp)
+			? path.resolve(process.cwd(), sp)
+			: sp;
 	}
 
 	if (!trackedState.useFlexTier && isTrue(process.env.HARPER_AGENT_FLEX_TIER)) {

@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseArgs } from './parseArgs';
 import { trackedState } from './trackedState';
@@ -164,13 +165,13 @@ describe('parseArgs CLI arguments', () => {
 	it('parses session path with --session', () => {
 		process.argv.push('--session', './my-session.json');
 		parseArgs();
-		expect(trackedState.sessionPath).toBe('./my-session.json');
+		expect(trackedState.sessionPath).toEqual(expect.stringMatching(/my-session\.json$/));
 	});
 
 	it('parses session path with -s=', () => {
 		process.argv.push('-s=./my-session.json');
 		parseArgs();
-		expect(trackedState.sessionPath).toBe('./my-session.json');
+		expect(trackedState.sessionPath).toEqual(expect.stringMatching(/my-session\.json$/));
 	});
 
 	it('parses boolean flag --flex-tier', () => {
@@ -215,7 +216,8 @@ describe('parseArgs Environment Variables', () => {
 	it('uses HARPER_AGENT_SESSION', () => {
 		process.env.HARPER_AGENT_SESSION = './env-session.json';
 		parseArgs();
-		expect(trackedState.sessionPath).toBe('./env-session.json');
+		const expected = path.resolve(process.cwd(), './env-session.json');
+		expect(trackedState.sessionPath).toBe(expected);
 	});
 
 	it('uses HARPER_AGENT_FLEX_TIER=true', () => {
@@ -266,6 +268,47 @@ describe('parseArgs Environment Variables', () => {
 		parseArgs();
 		expect(trackedState.model).toBe('gpt-cli');
 	});
+
+	it('resolves relative HARPER_AGENT_SESSION without ./ to absolute path', () => {
+		process.env.HARPER_AGENT_SESSION = 'env-session.json';
+		parseArgs();
+		const expected = path.resolve(process.cwd(), 'env-session.json');
+		expect(trackedState.sessionPath).toBe(expected);
+	});
+
+	it('does not resolve absolute HARPER_AGENT_SESSION path', () => {
+		const abs = path.resolve(process.cwd(), 'abs-session.json');
+		process.env.HARPER_AGENT_SESSION = abs;
+		parseArgs();
+		expect(trackedState.sessionPath).toBe(abs);
+	});
+
+	it('does not resolve tilde-prefixed HARPER_AGENT_SESSION path', () => {
+		process.env.HARPER_AGENT_SESSION = '~/env-session.json';
+		parseArgs();
+		expect(trackedState.sessionPath).toBe('~/env-session.json');
+	});
+
+	it('keeps env-driven sessionPath stable across cwd changes', () => {
+		const original = process.cwd();
+		try {
+			process.env.HARPER_AGENT_SESSION = './env-session.json';
+			parseArgs();
+			const first = trackedState.sessionPath;
+			process.chdir(path.dirname(original));
+			process.chdir(original);
+			expect(trackedState.sessionPath).toBe(first);
+		} finally {
+			process.chdir(original);
+		}
+	});
+
+	it('CLI --session takes precedence over HARPER_AGENT_SESSION', () => {
+		process.env.HARPER_AGENT_SESSION = './env-session.json';
+		process.argv.push('--session', 'cli-session.json');
+		parseArgs();
+		expect(trackedState.sessionPath).toEqual(expect.stringMatching(/cli-session\.json$/));
+	});
 });
 
 describe('parseArgs edge cases and mixed scenarios', () => {
@@ -280,7 +323,7 @@ describe('parseArgs edge cases and mixed scenarios', () => {
 		process.argv.push('--model', 'gpt-4', '--session', 'sess.json', '-c=claude-3');
 		parseArgs();
 		expect(trackedState.model).toBe('gpt-4');
-		expect(trackedState.sessionPath).toBe('sess.json');
+		expect(trackedState.sessionPath).toEqual(expect.stringMatching(/sess\.json$/));
 		expect(trackedState.compactionModel).toBe('claude-3');
 	});
 
