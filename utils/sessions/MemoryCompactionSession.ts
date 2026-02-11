@@ -7,6 +7,7 @@ import {
 	type Session,
 } from '@openai/agents';
 import { trackedState } from '../../lifecycle/trackedState';
+import type { WithSkillsRead } from '../../lifecycle/withSkillsRead';
 import { excludeFalsy } from '../arrays/excludeFalsy';
 import { compactConversation } from './compactConversation';
 import { getCompactionTriggerTokens } from './modelContextLimits';
@@ -21,10 +22,11 @@ export interface MemoryCompactionSessionOptions {
  * This is intended for use with non-OpenAI models where OpenAI's built-in
  * compaction is not available.
  */
-export class MemoryCompactionSession implements OpenAIResponsesCompactionAwareSession {
+export class MemoryCompactionSession implements OpenAIResponsesCompactionAwareSession, WithSkillsRead {
 	private readonly underlyingSession: Session;
 	private readonly triggerTokens?: number;
 	private itemsAddedSinceLastCompaction: number = 0;
+	private skillsReadLocal: Set<string> = new Set();
 
 	constructor(options: MemoryCompactionSessionOptions) {
 		this.underlyingSession = options.underlyingSession ?? new MemorySession();
@@ -36,6 +38,26 @@ export class MemoryCompactionSession implements OpenAIResponsesCompactionAwareSe
 
 	async getSessionId(): Promise<string> {
 		return this.underlyingSession.getSessionId();
+	}
+
+	async addSkillRead(skill: string): Promise<void> {
+		const u = this.underlyingSession as unknown as WithSkillsRead;
+		if (u && typeof u.addSkillRead === 'function') {
+			return u.addSkillRead(skill);
+		}
+		this.skillsReadLocal.add(skill);
+	}
+
+	async getSkillsRead(): Promise<string[]> {
+		const u = this.underlyingSession as unknown as WithSkillsRead;
+		let base: string[] = [];
+		if (u && typeof u.getSkillsRead === 'function') {
+			try {
+				base = await Promise.resolve(u.getSkillsRead());
+			} catch {}
+		}
+		const merged = new Set<string>([...base, ...this.skillsReadLocal]);
+		return Array.from(merged);
 	}
 
 	async getItems(limit?: number): Promise<AgentInputItem[]> {

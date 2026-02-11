@@ -16,6 +16,12 @@ export const readFileTool = tool({
 	parameters: ToolParameters,
 	async execute({ fileName }: z.infer<typeof ToolParameters>) {
 		try {
+			// If the requested file appears to be a Harper skill markdown, record the skill name
+			const normalized = String(fileName).replace(/\\/g, '/');
+			const m = normalized.match(/(?:^|\/)skills\/([A-Za-z0-9_-]+)\.md(?:$|[?#])/);
+			if (m && m[1]) {
+				trackedState.session?.addSkillRead?.(m[1]);
+			}
 			const resolvedPath = resolvePath(trackedState.cwd, fileName);
 			return readFile(resolvedPath, 'utf8');
 		} catch (error) {

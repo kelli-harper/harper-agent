@@ -1,4 +1,6 @@
-import { Agent } from '@openai/agents';
+import type { Agent, Session } from '@openai/agents';
+import type { WithRunCompaction } from './withRunCompaction';
+import type { WithSkillsRead } from './withSkillsRead';
 
 export interface TrackedState {
 	agent: Agent | null;
@@ -13,6 +15,8 @@ export interface TrackedState {
 	useFlexTier: boolean;
 	disableSpinner: boolean;
 	enableInterruptions: boolean; // whether stdin can interrupt model runs
+	// Current session instance (may implement additional capabilities like skills tracking)
+	session: (Session & WithRunCompaction & WithSkillsRead) | null;
 }
 
 export const trackedState: TrackedState = {
@@ -28,4 +32,5 @@ export const trackedState: TrackedState = {
 	useFlexTier: false,
 	disableSpinner: false,
 	enableInterruptions: true,
+	session: null,
 };

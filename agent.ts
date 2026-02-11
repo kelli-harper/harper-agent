@@ -46,7 +46,7 @@ async function main() {
 		tools: createTools(),
 	});
 
-	const session = createSession(trackedState.sessionPath);
+	const session = trackedState.session = createSession(trackedState.sessionPath);
 
 	while (true) {
 		let task: string = '';

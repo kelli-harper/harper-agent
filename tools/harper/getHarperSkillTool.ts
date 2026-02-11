@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { z } from 'zod';
+import { trackedState } from '../../lifecycle/trackedState';
 
 const createHarper = dirname(createRequire(import.meta.url).resolve('create-harper'));
 
@@ -17,8 +18,7 @@ const skillsDir = join(
 );
 
 export const skillLinkRegex = /\[[^\]]+]\(skills\/([^)]+)\.md\)/g;
-
-const skills = getSkills();
+export const skills = getSkills();
 
 const ToolParameters = z.object({
 	skill: z.enum(skills.length > 0 ? (skills as [string, ...string[]]) : ['none']).describe(
@@ -59,7 +59,9 @@ export async function execute({ skill }: z.infer<typeof ToolParameters>) {
 	}
 	try {
 		const filePath = join(skillsDir, `${skill}.md`);
-		return readFileSync(filePath, 'utf8');
+		const content = readFileSync(filePath, 'utf8');
+		trackedState.session?.addSkillRead?.(skill);
+		return content;
 	} catch (error) {
 		return `Error reading Harper skill "${skill}": ${error}`;
 	}

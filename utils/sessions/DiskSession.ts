@@ -2,16 +2,18 @@ import { type AgentInputItem, MemorySession } from '@openai/agents';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import type { WithSkillsRead } from '../../lifecycle/withSkillsRead';
 
 interface Storage {
 	sessions: Record<string, AgentInputItem[]>;
+	skillsRead?: Record<string, string[]>;
 }
 
 /**
  * A session that persists items to a JSON file on disk.
  * Extends MemorySession to provide in-memory caching and basic session functionality.
  */
-export class DiskSession extends MemorySession {
+export class DiskSession extends MemorySession implements WithSkillsRead {
 	private readonly filePath: string;
 	private readonly ready: Promise<void>;
 
@@ -65,12 +67,16 @@ export class DiskSession extends MemorySession {
 		if (existsSync(this.filePath)) {
 			try {
 				const data = await readFile(this.filePath, 'utf-8');
-				return JSON.parse(data);
+				const parsed = JSON.parse(data) as Storage;
+				// Ensure required structures exist for backward compatibility
+				parsed.sessions = parsed.sessions || {} as any;
+				parsed.skillsRead = parsed.skillsRead || {};
+				return parsed;
 			} catch (e) {
 				console.error(`Failed to read session file ${this.filePath}:`, e);
 			}
 		}
-		return { sessions: {} };
+		return { sessions: {}, skillsRead: {} };
 	}
 
 	private async updateStorage(update: (storage: Storage) => void): Promise<void> {
@@ -146,6 +152,26 @@ export class DiskSession extends MemorySession {
 		const sessionId = await this.getSessionId();
 		await this.updateStorage((storage) => {
 			delete storage.sessions[sessionId];
+			if (storage.skillsRead) {
+				delete storage.skillsRead[sessionId];
+			}
 		});
+	}
+
+	async addSkillRead(skill: string): Promise<void> {
+		await this.ready;
+		const sessionId = await this.getSessionId();
+		await this.updateStorage((storage) => {
+			if (!storage.skillsRead) { storage.skillsRead = {}; }
+			const arr = storage.skillsRead[sessionId] ?? (storage.skillsRead[sessionId] = []);
+			if (!arr.includes(skill)) { arr.push(skill); }
+		});
+	}
+
+	async getSkillsRead(): Promise<string[]> {
+		await this.ready;
+		const sessionId = await this.getSessionId();
+		const storage = await this.loadStorage();
+		return storage.skillsRead?.[sessionId] ?? [];
 	}
 }
