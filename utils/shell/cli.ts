@@ -38,6 +38,12 @@ ${chalk.bold('OPTIONS')}
                           Can also be set via HARPER_AGENT_COMPACTION_MODEL environment variable.
   -s, --session           Specify a path to a SQLite database file to persist the chat session.
                           Can also be set via HARPER_AGENT_SESSION environment variable.
+  --max-turns             Specify the maximum number of turns for the agent run.
+                          In task-driven mode, this defaults to unlimited.
+                          Can also be set via HARPER_AGENT_MAX_TURNS environment variable.
+  --max-cost              Specify the maximum cost (in USD) for the agent run.
+                          If exceeded, the agent will exit with a non-zero code.
+                          Can also be set via HARPER_AGENT_MAX_COST environment variable.
   --flex-tier             Force the use of the flex service tier for lower costs but potentially 
                           more errors under high system load.
                           Can also be set via HARPER_AGENT_FLEX_TIER=true environment variable.

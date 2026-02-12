@@ -103,6 +103,25 @@ class CostTracker {
 		this.hasUnknownPrices = false;
 	}
 
+	public getTotalCost() {
+		return this.totalCost + this.totalCompactionCost;
+	}
+
+	public getEstimatedTotalCost(
+		currentTurnUsage:
+			| Pick<Usage, 'requestUsageEntries' | 'outputTokens' | 'inputTokens' | 'inputTokensDetails'>
+			| undefined,
+		model: string,
+		compactionModel?: string,
+	) {
+		const { turnCost, compactionCost } = this.calculateUsageCosts(
+			model,
+			currentTurnUsage,
+			compactionModel,
+		);
+		return this.getTotalCost() + turnCost + compactionCost;
+	}
+
 	public recordTurn(
 		model: string,
 		usage: Pick<Usage, 'requestUsageEntries' | 'outputTokens' | 'inputTokens' | 'inputTokensDetails'>,

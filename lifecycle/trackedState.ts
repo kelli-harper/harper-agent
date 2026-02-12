@@ -15,6 +15,8 @@ export interface TrackedState {
 	useFlexTier: boolean;
 	disableSpinner: boolean;
 	enableInterruptions: boolean; // whether stdin can interrupt model runs
+	maxTurns: number;
+	maxCost: number | null;
 	// Current session instance (may implement additional capabilities like skills tracking)
 	session: (Session & WithRunCompaction & WithSkillsRead) | null;
 }
@@ -32,5 +34,7 @@ export const trackedState: TrackedState = {
 	useFlexTier: false,
 	disableSpinner: false,
 	enableInterruptions: true,
+	maxTurns: 30,
+	maxCost: null,
 	session: null,
 };

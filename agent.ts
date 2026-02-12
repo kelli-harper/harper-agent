@@ -85,7 +85,7 @@ async function main() {
 				session,
 				stream: true,
 				signal: trackedState.controller.signal,
-				maxTurns: 30,
+				maxTurns: trackedState.maxTurns,
 			});
 			trackedState.approvalState = null;
 
@@ -175,6 +175,27 @@ async function main() {
 					trackedState.compactionModel || 'gpt-4o-mini',
 				);
 
+				if (trackedState.maxCost !== null) {
+					const estimatedTotalCost = costTracker.getEstimatedTotalCost(
+						stream.state.usage,
+						trackedState.model || 'gpt-5.2',
+						trackedState.compactionModel || 'gpt-4o-mini',
+					);
+					if (estimatedTotalCost > trackedState.maxCost) {
+						spinner.stop();
+						console.log(
+							chalk.red(
+								`Cost limit exceeded: $${estimatedTotalCost.toFixed(4)} > $${trackedState.maxCost.toFixed(4)}`,
+							),
+						);
+						if (trackedState.controller) {
+							trackedState.controller.abort();
+						}
+						process.exitCode = 1;
+						return handleExit();
+					}
+				}
+
 				// No break here - let the stream finish naturally so we can capture all events
 				// and potential multiple interruptions in one turn.
 			}
@@ -210,6 +231,17 @@ async function main() {
 					stream.state.usage,
 					trackedState.compactionModel || 'gpt-4o-mini',
 				);
+
+				if (trackedState.maxCost !== null && costTracker.getTotalCost() > trackedState.maxCost) {
+					spinner.stop();
+					console.log(
+						chalk.red(
+							`Cost limit exceeded: $${costTracker.getTotalCost().toFixed(4)} > $${trackedState.maxCost.toFixed(4)}`,
+						),
+					);
+					process.exitCode = 1;
+					return handleExit();
+				}
 			}
 
 			// If we received an initial prompt via stdin, treat this as a one-shot run

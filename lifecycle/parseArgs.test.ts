@@ -17,6 +17,8 @@ function resetState() {
 	trackedState.useFlexTier = false;
 	trackedState.disableSpinner = false;
 	trackedState.enableInterruptions = true;
+	trackedState.maxTurns = 30;
+	trackedState.maxCost = null;
 }
 
 function clearAllEnv() {
@@ -27,6 +29,8 @@ function clearAllEnv() {
 	delete process.env.HARPER_AGENT_DISABLE_INTERRUPTIONS;
 	delete process.env.HARPER_AGENT_ENABLE_INTERRUPTION;
 	delete process.env.HARPER_AGENT_ENABLE_INTERRUPTIONS;
+	delete process.env.HARPER_AGENT_MAX_TURNS;
+	delete process.env.HARPER_AGENT_MAX_COST;
 }
 
 function clearProviderEnv() {
@@ -367,5 +371,35 @@ describe('parseArgs edge cases and mixed scenarios', () => {
 		process.env.OPENAI_AGENTS_DISABLE_TRACING = '0';
 		parseArgs();
 		expect(process.env.OPENAI_AGENTS_DISABLE_TRACING).toBe('0');
+	});
+
+	it('parses --max-turns', () => {
+		process.argv.push('--max-turns', '50');
+		parseArgs();
+		expect(trackedState.maxTurns).toBe(50);
+	});
+
+	it('parses --max-turns with =', () => {
+		process.argv.push('--max-turns=100');
+		parseArgs();
+		expect(trackedState.maxTurns).toBe(100);
+	});
+
+	it('parses --max-cost', () => {
+		process.argv.push('--max-cost', '1.5');
+		parseArgs();
+		expect(trackedState.maxCost).toBe(1.5);
+	});
+
+	it('parses --max-cost from env', () => {
+		process.env.HARPER_AGENT_MAX_COST = '2.5';
+		parseArgs();
+		expect(trackedState.maxCost).toBe(2.5);
+	});
+
+	it('parses --max-turns from env', () => {
+		process.env.HARPER_AGENT_MAX_TURNS = '75';
+		parseArgs();
+		expect(trackedState.maxTurns).toBe(75);
 	});
 });

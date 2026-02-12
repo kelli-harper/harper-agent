@@ -1,4 +1,4 @@
-import type { ModelSettings } from '@openai/agents-core/model';
+import type { ModelSettings } from '@openai/agents';
 import { trackedState } from '../../lifecycle/trackedState';
 
 export const modelSettings: ModelSettings = {

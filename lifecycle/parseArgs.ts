@@ -28,6 +28,8 @@ export function parseArgs() {
 			['model', ['--model', '-m', 'model']],
 			['compactionModel', ['--compaction-model', '-c', 'compaction-model']],
 			['sessionPath', ['--session', '-s', 'session']],
+			['maxTurns', ['--max-turns']],
+			['maxCost', ['--max-cost']],
 		] as const;
 
 		let handled = false;
@@ -35,12 +37,22 @@ export function parseArgs() {
 			for (const prefix of prefixes) {
 				if (arg === prefix) {
 					if (args[i + 1]) {
-						trackedState[key] = stripQuotes(args[++i]!);
+						const val = stripQuotes(args[++i]!);
+						if (key === 'maxTurns' || key === 'maxCost') {
+							(trackedState as any)[key] = parseFloat(val);
+						} else {
+							trackedState[key] = val;
+						}
 					}
 					handled = true;
 					break;
 				} else if (arg.startsWith(`${prefix}=`)) {
-					trackedState[key] = stripQuotes(arg.slice(prefix.length + 1));
+					const val = stripQuotes(arg.slice(prefix.length + 1));
+					if (key === 'maxTurns' || key === 'maxCost') {
+						(trackedState as any)[key] = parseFloat(val);
+					} else {
+						trackedState[key] = val;
+					}
 					handled = true;
 					break;
 				}
@@ -78,6 +90,13 @@ export function parseArgs() {
 	}
 	if (!trackedState.sessionPath && process.env.HARPER_AGENT_SESSION) {
 		trackedState.sessionPath = process.env.HARPER_AGENT_SESSION;
+	}
+
+	if (process.env.HARPER_AGENT_MAX_TURNS) {
+		trackedState.maxTurns = parseFloat(process.env.HARPER_AGENT_MAX_TURNS);
+	}
+	if (process.env.HARPER_AGENT_MAX_COST) {
+		trackedState.maxCost = parseFloat(process.env.HARPER_AGENT_MAX_COST);
 	}
 
 	// Resolve immediately so the path remains stable if CWD changes later
