@@ -43,13 +43,17 @@ async function requiredSkillForOperation(
 	const p = normalizedPath(path);
 	const read = await getSkillsRead();
 	// Guard 1: resources/
-	if (p.includes('/resources/') || p.startsWith('resources/')) {
-		if (!read.includes('custom-resources') && !read.includes('extending-tables')) {
-			return pickExistingSkill(['custom-resources', 'extending-tables']);
+	if (
+		p.includes('/resources/') || p.startsWith('resources/') || p.endsWith('resources.ts') || p.endsWith('resources.js')
+	) {
+		if (!read.includes('automatic-apis')) {
+			return pickExistingSkill(['automatic-apis']);
 		}
 	}
 	// Guard 2: schemas/ or schema/
-	if (p.includes('/schemas/') || p.startsWith('schemas/') || p.includes('/schema/') || p.startsWith('schema/')) {
+	if (
+		p.endsWith('.graphql')
+	) {
 		if (!read.includes('adding-tables-with-schemas')) {
 			return pickExistingSkill(['adding-tables-with-schemas']);
 		}
@@ -103,6 +107,7 @@ export async function execute(operation: z.infer<typeof ApplyPatchParameters>) {
 		const needed = await requiredSkillForOperation(operation.path, operation.type);
 		if (needed) {
 			const content = await getHarperSkillExecute({ skill: needed });
+			console.log(`Understanding ${needed} is necessary before applying this patch.`);
 			return { status: 'failed, skill guarded', output: content } as const;
 		}
 		switch (operation.type) {
@@ -134,35 +139,6 @@ export function createApplyPatchTool() {
 		description: 'Applies a patch (create, update, or delete a file) to the workspace.',
 		parameters: ApplyPatchParameters,
 		needsApproval,
-		execute: async (operation) => {
-			try {
-				// Guard check: if a required skill is missing, return that skill content instead of applying the patch
-				const needed = await requiredSkillForOperation(operation.path, operation.type);
-				if (needed) {
-					const content = await getHarperSkillExecute({ skill: needed } as any);
-					return { status: 'completed', output: content } as const;
-				}
-				switch (operation.type) {
-					case 'create_file':
-						if (!operation.diff) {
-							return { status: 'failed', output: 'Error: diff is required for create_file' } as const;
-						}
-						return await editor.createFile(operation as any);
-					case 'update_file':
-						if (!operation.diff) {
-							return { status: 'failed', output: 'Error: diff is required for update_file' } as const;
-						}
-						return await editor.updateFile(operation as any);
-					case 'delete_file':
-						return await editor.deleteFile(operation as any);
-					default:
-						return { status: 'failed', output: `Error: Unknown operation type: ${(operation as any).type}` } as const;
-				}
-			} catch (err) {
-				console.error('hit unexpected error in apply patch tool', err);
-				// Ensure the tool always returns something the LLM can react to
-				return { status: 'failed', output: `apply_patch threw: ${String(err)}` } as const;
-			}
-		},
+		execute,
 	});
 }

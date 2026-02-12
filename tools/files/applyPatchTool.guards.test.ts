@@ -15,9 +15,9 @@ describe('applyPatchTool guards', () => {
 
 	it('bypasses HITL and returns skill content when writing to resources/ without prior skill', async () => {
 		// Ensure at least one of the required skills exists; otherwise skip this test
-		const targetSkill = harperSkills.includes('custom-resources')
-			? 'custom-resources'
-			: (harperSkills.includes('extending-tables') ? 'extending-tables' : null);
+		const targetSkill = harperSkills.includes('automatic-apis')
+			? 'automatic-apis'
+			: (harperSkills.includes('adding-tables-with-schemas') ? 'adding-tables-with-schemas' : null);
 		if (!targetSkill) {
 			// Environment without the expected skills; the feature is a no-op
 			return;
