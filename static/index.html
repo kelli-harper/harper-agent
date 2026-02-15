@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Valentine Heart Sender</title>
+    <style>
+        body { background: #fff0f5; font-family: 'Arial', sans-serif; text-align: center; padding: 50px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: inline-block; }
+        h1 { color: #ff69b4; }
+        input, textarea { width: 80%; padding: 10px; margin: 10px 0; border: 2px solid #ffb6c1; border-radius: 10px; }
+        button { background: #ff69b4; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #ff1493; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>💖 Send a Candy Heart 💖</h1>
+        <input type="text" id="sender" placeholder="Your Name">
+        <input type="text" id="receiver" placeholder="To My Valentine...">
+        <textarea id="message" placeholder="Type your sweet message here..."></textarea>
+        <br>
+        <button onclick="sendHeart()">Send Heart!</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function sendHeart() {
+            const data = {
+                sender: document.getElementById('sender').value,
+                receiver: document.getElementById('receiver').value,
+                message: document.getElementById('message').value,
+                heartColor: "Pink"
+            };
+
+            const response = await fetch('/api/Valentine', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                document.getElementById('status').innerText = "💝 Heart Sent Successfully!";
+            } else {
+                document.getElementById('status').innerText = "❌ Oops, try again!";
+            }
+        }
+    </script>
+</body>
+</html>
