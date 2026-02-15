@@ -16,7 +16,6 @@
 		"start": "node ./dist/agent.js",
 		"lint": "oxlint --format stylish .",
 		"lint:fix": "oxlint --format stylish . --fix",
-		"prepare": "husky",
 		"format": "dprint check",
 		"format:fix": "dprint fmt",
 		"format:staged": "dprint check --staged --allow-no-files",
