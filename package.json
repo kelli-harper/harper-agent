@@ -2,7 +2,7 @@
 	"name": "@harperfast/agent",
 	"description": "AI to help you with Harper app management",
 	"version": "0.13.2",
-	"type: "module",
+	"type": "module",
 	"main": "index.ts",
 	"repository": "github:HarperFast/harper-agent",
 	"bugs": {
